@@ -176,7 +176,7 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
 .bshop-main{font-size:16pt;font-weight:800;text-decoration:underline;letter-spacing:.04em;line-height:1.1}
 .bshop-sub{font-size:9pt;font-weight:600;color:#444;margin-top:2px;letter-spacing:.06em}
 .bshop-sub span{font-weight:700;color:#000}
-.binfo{font-size:8pt;line-height:1.5;margin-top:3px}
+.binfo{font-size:8pt;line-height:1.5;margin-top:3px;color:#000 !important;background:#fff !important}
 .bivtbl{width:100%;border-collapse:collapse;margin-top:5px;font-size:8.5pt}
 .bivtbl td{border:1px solid #000;padding:3px 5px}
 .bivtbl td:first-child{font-weight:700;width:45%}
@@ -199,8 +199,8 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
 .bfoot td{padding:2.5px 5px;font-size:8.5pt;border-bottom:1px solid #ddd}
 .bfoot td:first-child{font-weight:700}
 .bfoot td:last-child{text-align:right;font-weight:600}
-.bfoot .bfg{background:#FFF7E0;font-size:10pt;font-weight:800}
-.bfoot .bfd{color:#C62828;font-weight:800}
+.bfoot .bfg{background:#fff;font-size:10pt;font-weight:800;border-top:2px solid #000}
+.bfoot .bfd{color:#000;font-weight:800}
 .bbank{border:1px solid #000;padding:5px 8px;margin-top:6px;font-size:8pt;line-height:1.6}
 .bcond{border:2px solid #000;border-top:none;padding:5px 10px;font-size:7.5pt;line-height:1.55}
 .bwords{border:2px solid #000;border-top:none;padding:5px 10px;font-size:8.5pt;font-style:italic;font-weight:600}
@@ -210,6 +210,14 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
 .bsigline{border-top:1px solid #000;width:160px;margin-top:24px;padding-top:3px;font-size:8pt}
 .copy-label{background:#000;color:#fff;text-align:center;font-weight:800;font-size:10pt;padding:4px 8px;letter-spacing:.15em}
 
+/* B&W style for all bill copies */
+.bw-copy{filter:grayscale(100%) contrast(1.1)}
+.bw-copy *{color:#000 !important;background:#fff !important;border-color:#000 !important}
+.bw-copy .copy-label{background:#000 !important;color:#fff !important}
+.bw-copy .binfo{background:#fff !important;color:#000 !important}
+.bw-copy th{background:#e0e0e0 !important;color:#000 !important}
+.bw-copy .bshop-main{color:#000 !important}
+
 @media print{
   *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   body,html{background:#fff;padding:0;margin:0}
@@ -217,6 +225,9 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
   #loginScreen,#shopScreen{display:none !important}
   #billWrap{position:static;left:0;width:210mm;z-index:auto}
   .bill-a4{width:210mm;min-height:297mm;padding:7mm 6mm}
+  .bw-copy{filter:grayscale(100%) contrast(1.05) !important}
+  .bw-copy *{color:#000 !important;background:white !important}
+  .bw-copy .copy-label{background:#000 !important;color:#fff !important}
   @page{size:A4 portrait;margin:0}
 }
 @media(max-width:520px){
@@ -297,14 +308,6 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
     </div>
     <div style="padding:16px">
       <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="https://jkazi388.github.io/geeta-super/" target="_blank" style="text-decoration:none">
-          <div style="background:#FFF7E0;border:2px solid #C8932A;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
-            <span style="font-size:2rem">🛍️</span>
-            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">Catalog Website</div>
-            <div style="font-size:.78rem;color:#888;margin-top:2px">jkazi388.github.io/geeta-super</div></div>
-            <span style="margin-left:auto;color:#C8932A;font-size:1.2rem">→</span>
-          </div>
-        </a>
         <a href="https://geeta-super-web.netlify.app" target="_blank" style="text-decoration:none">
           <div style="background:#FFF7E0;border:2px solid #C8932A;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
             <span style="font-size:2rem">🛍️</span>
@@ -370,7 +373,6 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
         <button class="htab" onclick="pg('stock')" id="t-stock">📦 Stock</button>
         <button class="htab" onclick="pg('purchase')" id="t-purchase">🛒 Purchase</button>
         <button class="htab" onclick="pg('costing')" id="t-costing">🧮 Costing</button>
-        <button class="htab" onclick="pg('calc')" id="t-calc">🔢 Calculator</button>
         <button class="htab" onclick="openGeetaWeb()" id="t-geeta" style="background:rgba(200,147,42,.3)">🌐 Geeta Web</button>
         <button class="htab" onclick="pg('dash')" id="t-dash">📊 Dashboard</button>
         <button class="htab" onclick="pg('sett')" id="t-sett">⚙️ Settings</button>
@@ -765,57 +767,11 @@ body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1
     </div><!-- end costing system -->
   </div><!-- end pg-costing -->
 
-  <!-- CALCULATOR TAB -->
-  <div id="pg-calc" style="display:none">
-    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
-    <div class="card" style="max-width:360px;margin:0 auto">
-      <div class="ct">🔢 Calculator</div>
-      <!-- Display -->
-      <div style="background:#1A1208;border-radius:10px;padding:16px 14px;margin-bottom:14px">
-        <div id="calcExpr" style="color:#C8932A;font-size:.8rem;min-height:18px;text-align:right;margin-bottom:4px;word-break:break-all;opacity:.8"></div>
-        <div id="calcDisplay" style="color:#E8B84B;font-size:2.2rem;font-weight:800;text-align:right;word-break:break-all;line-height:1.2">0</div>
-      </div>
-      <!-- Buttons -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        <!-- Row 1 -->
-        <button onclick="calcBtn('C')" style="grid-column:span 2;padding:16px;background:#eb5757;color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit">C Clear</button>
-        <button onclick="calcBtn('back')" style="padding:16px;background:#C8932A;color:#1A1208;border:none;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">⌫</button>
-        <button onclick="calcBtn('/')" style="padding:16px;background:#C8932A;color:#1A1208;border:none;border-radius:8px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit">÷</button>
-        <!-- Row 2 -->
-        <button onclick="calcBtn('7')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">7</button>
-        <button onclick="calcBtn('8')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">8</button>
-        <button onclick="calcBtn('9')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">9</button>
-        <button onclick="calcBtn('*')" style="padding:16px;background:#C8932A;color:#1A1208;border:none;border-radius:8px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit">×</button>
-        <!-- Row 3 -->
-        <button onclick="calcBtn('4')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">4</button>
-        <button onclick="calcBtn('5')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">5</button>
-        <button onclick="calcBtn('6')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">6</button>
-        <button onclick="calcBtn('-')" style="padding:16px;background:#C8932A;color:#1A1208;border:none;border-radius:8px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit">−</button>
-        <!-- Row 4 -->
-        <button onclick="calcBtn('1')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">1</button>
-        <button onclick="calcBtn('2')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">2</button>
-        <button onclick="calcBtn('3')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">3</button>
-        <button onclick="calcBtn('+')" style="padding:16px;background:#C8932A;color:#1A1208;border:none;border-radius:8px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit">+</button>
-        <!-- Row 5 -->
-        <button onclick="calcBtn('0')" style="grid-column:span 2;padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">0</button>
-        <button onclick="calcBtn('.')" style="padding:16px;background:#fff;border:1.5px solid #eee;border-radius:8px;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit">.</button>
-        <button onclick="calcBtn('=')" style="padding:16px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit">=</button>
-      </div>
-    </div>
-  </div>
-
   <!-- OWNER DASHBOARD -->
   <div id="pg-dash" style="display:none">
     <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
     <div class="card">
       <div class="ct">📊 Owner Dashboard — সব দোকান</div>
-      <div style="margin-bottom:14px">
-        <a href="https://jkazi388.github.io/geeta-super/" target="_blank"
-          style="display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#1A1208,#3A2A10);color:#E8B84B;border-radius:10px;padding:14px 16px;font-weight:800;font-size:.95rem;text-decoration:none;box-shadow:0 3px 10px rgba(0,0,0,.2)">
-          🛍️ GEETA SUPER — Catalog Website খুলুন
-          <span style="font-size:.72rem;background:#C8932A;color:#1A1208;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap">OPEN ↗</span>
-        </a>
-      </div>
       <div id="dashBox"><p style="text-align:center;padding:20px;color:#888">Loading...</p></div>
     </div>
   </div>
@@ -1031,7 +987,7 @@ function removeShop(id){
 
 // ===== TABS =====
 function pg(t){
-  ["new","list","sett","cust","stock","dash","purchase","costing","calc"].forEach(x=>{
+  ["new","list","sett","cust","stock","dash","purchase","costing"].forEach(x=>{
     document.getElementById("pg-"+x).style.display=x===t?"block":"none";
     document.getElementById("t-"+x)?.classList.toggle("on",x===t);
   });
@@ -1042,44 +998,6 @@ function pg(t){
   if(t==="purchase"){initCatGrid();renderPurchase();}
   if(t==="costing"){cRenderItems();cCalc();}
 }
-
-// ===== CALCULATOR =====
-let _calcExpr="",_calcResult="0",_calcDone=false;
-function calcBtn(v){
-  const disp=document.getElementById("calcDisplay");
-  const expr=document.getElementById("calcExpr");
-  if(v==="C"){_calcExpr="";_calcResult="0";_calcDone=false;}
-  else if(v==="back"){
-    if(_calcDone){_calcExpr="";_calcResult="0";_calcDone=false;}
-    else{_calcResult=_calcResult.length>1?_calcResult.slice(0,-1):"0";}
-  }
-  else if(v==="="){
-    try{
-      const e=_calcExpr+_calcResult;
-      const r=Function('"use strict";return ('+e+')')();
-      _calcExpr=e+" =";
-      _calcResult=parseFloat(r.toFixed(10)).toString();
-      _calcDone=true;
-    }catch{_calcResult="Error";_calcDone=true;}
-  }
-  else if(["+","-","*","/"].includes(v)){
-    if(_calcResult!=="0"||_calcExpr){
-      _calcExpr+=_calcResult+v;
-      _calcResult="0";_calcDone=false;
-    }
-  }
-  else if(v==="."){
-    if(_calcDone){_calcExpr="";_calcResult="0";_calcDone=false;}
-    if(!_calcResult.includes("."))_calcResult+=".";
-  }
-  else{// digit
-    if(_calcDone){_calcExpr="";_calcResult="0";_calcDone=false;}
-    _calcResult=_calcResult==="0"?v:_calcResult+v;
-  }
-  disp.textContent=_calcResult;
-  expr.textContent=_calcExpr;
-}
-window.calcBtn=calcBtn;
 
 // ===== BILL TYPE =====
 function setT(t){
@@ -1107,7 +1025,7 @@ function genInvNo(){
   const n=shopBills+(parseInt(S.start)||1);
   return`${pre}-${yr}-${String(n).padStart(4,"0")}`;
 }
-function resetInvNo(){document.getElementById("bNo").value=genInvNo();}
+function resetInvNo(force){if(!force&&curId)return;document.getElementById("bNo").value=genInvNo();}
 
 // ===== GST STATE CODES =====
 const GST_STATES={
@@ -1441,6 +1359,7 @@ function showSaveBanner(msg){
 
 // ===== BUILD BILL =====
 function buildCopy(b,copyLabel){
+  // Without GST copy will be B&W via CSS class
   const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
   const rows=[];
   for(let i=0;i<14;i++){
@@ -1453,7 +1372,8 @@ function buildCopy(b,copyLabel){
   const headerLeft=isGST
     ?`<div class="bshop-main">${S.co}</div><div class="binfo"><b>${S.own}</b> · Mob: <b>${S.mob}</b><br/>${S.addr.replace(/\n/g,'<br/>')}</div>`
     :`<div class="bshop-main">${S.co}</div><div class="bshop-sub"><span>${S.co2||'TESLA INDIA'}</span>${S.tag2?' — '+S.tag2:''}</div><div class="binfo"><b>${S.own}</b> · Mob: <b>${S.mob}</b><br/>${S.addr.replace(/\n/g,'<br/>')}</div>`;
-  return`<div class="bill-a4">
+  const bwClass=' bw-copy';
+  return`<div class="bill-a4${bwClass}">
     <div class="copy-label">${copyLabel}</div>
     <div class="bh"><div>${headerLeft}</div>
       <div>
@@ -1505,7 +1425,7 @@ function buildCopy(b,copyLabel){
           ${isGST?`<tr><td>SGST:</td><td>${b.sgPct||0}% &nbsp; ₹${fmt(b.sgAmt)}</td></tr><tr><td>CGST:</td><td>${b.cgPct||0}% &nbsp; ₹${fmt(b.cgAmt)}</td></tr><tr><td>IGST:</td><td>${b.igPct||0}% &nbsp; ₹${fmt(b.igAmt)}</td></tr><tr><td>TOTAL GST AMOUNT:</td><td>₹${fmt(b.gstTotal)}</td></tr>`:''}
           <tr><td>PACKING CHARGE:</td><td>₹${fmt(b.packing)}</td></tr>
           <tr><td>INSURANCE CHARGE:</td><td>₹${fmt(b.insurance)}</td></tr>
-          ${(b.oldBal||0)>0?`<tr><td style="color:#C62828">OLD BALANCE:</td><td style="color:#C62828">₹${fmt(b.oldBal)}</td></tr>`:''}
+          ${(b.oldBal||0)>0?`<tr><td style="">OLD BALANCE:</td><td>₹${fmt(b.oldBal)}</td></tr>`:''}
           <tr class="bfg"><td>TOTAL AMOUNT:</td><td>₹${fmt(b.grandTotal)}</td></tr>
           <tr><td>PAID AMOUNT:</td><td>₹${fmt(b.paidAmt)}</td></tr>
           <tr class="bfd"><td>DUE AMOUNT:</td><td>₹${fmt(b.dueAmt)}</td></tr>
@@ -1537,6 +1457,8 @@ async function doPDF(){
   const b=await saveInv();
   if(!b){btn.disabled=false;btn.innerHTML="📄 PDF Download";return;}
   const copies=b.bType==="GST"?3:1;
+  // Lock invoice number before rendering
+  const lockedInvNo=b.invoiceNo;
   notice(`⏳ PDF তৈরি হচ্ছে (${copies}টি copy)... একটু অপেক্ষা করুন`,"info");
   document.getElementById("billWrap").innerHTML=buildAllCopies(b);
   await new Promise(r=>setTimeout(r,1200));
@@ -1546,7 +1468,9 @@ async function doPDF(){
     const divs=document.getElementById("billWrap").querySelectorAll(".bill-a4");
     for(let i=0;i<divs.length;i++){
       if(i>0)pdf.addPage();
+      divs[i].style.filter="grayscale(100%) contrast(1.05)";
       const canvas=await html2canvas(divs[i],{scale:2,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:794,windowWidth:794});
+      divs[i].style.filter="";
       pdf.addImage(canvas.toDataURL("image/jpeg",.94),"JPEG",0,0,210,Math.min((canvas.height*210)/canvas.width,297));
     }
     const fileName=`${b.invoiceNo}_${b.customer.name.replace(/\s+/g,"_")}.pdf`;
@@ -1554,6 +1478,7 @@ async function doPDF(){
     // Show download success with folder button
     const ov=document.createElement("div");
     ov.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px";
+    ov.onclick=function(e){if(e.target===ov)ov.remove();};
     ov.innerHTML=`<div style="background:#fff;border-radius:14px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3)">
       <div style="font-size:3rem;margin-bottom:10px">✅</div>
       <div style="font-weight:800;font-size:1.1rem;color:#27ae60;margin-bottom:6px">PDF Download হয়েছে!</div>
@@ -1562,12 +1487,14 @@ async function doPDF(){
         <button onclick="openDownloads()" style="background:#1976D2;color:#fff;border:none;padding:13px;border-radius:8px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:inherit">
           📂 Downloads Folder খুলুন
         </button>
-        <button onclick="this.closest('div[style]').remove()" style="background:#eee;color:#333;border:none;padding:11px;border-radius:8px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:inherit">
-          ← Back
+        <button id="pdfCloseBtn" style="background:#1A1208;color:#E8B84B;border:none;padding:13px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;width:100%">
+          ✕ বন্ধ করুন
         </button>
       </div>
+      <div style="font-size:.72rem;color:#aaa;margin-top:10px">বাইরে tap করলেও বন্ধ হবে</div>
     </div>`;
     document.body.appendChild(ov);
+    document.getElementById('pdfCloseBtn').onclick=function(){ov.remove();};
     notice(`✅ PDF ready! → Downloads folder এ দেখুন`,"ok");
   }catch(e){
     notice("❌ PDF error: "+e.message,"err");
@@ -1735,7 +1662,9 @@ async function dlOne(id){
     const divs=document.getElementById("billWrap").querySelectorAll(".bill-a4");
     for(let i=0;i<divs.length;i++){
       if(i>0)pdf.addPage();
+      divs[i].style.filter="grayscale(100%) contrast(1.05)";
       const canvas=await html2canvas(divs[i],{scale:2,useCORS:true,backgroundColor:"#ffffff",width:794,windowWidth:794});
+      divs[i].style.filter="";
       pdf.addImage(canvas.toDataURL("image/jpeg",.94),"JPEG",0,0,210,Math.min((canvas.height*210)/canvas.width,297));
     }
     pdf.save(`${b.invoiceNo}_${b.customer.name.replace(/\s+/g,"_")}.pdf`);
@@ -1756,885 +1685,4 @@ async function delB(id){
   catch(e){alert("Error: "+e.message);}
 }
 
-// ===== OWNER DASHBOARD =====
-function renderDash(){
-  const box=document.getElementById("dashBox");
-  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:0});
-  const today=new Date().toISOString().slice(0,10);
-
-  // SALES
-  const gstBills=allBills.filter(b=>b.bType==="GST");
-  const noGstBills=allBills.filter(b=>b.bType==="NoGST");
-  const gstSale=gstBills.reduce((s,b)=>s+(b.grandTotal||0),0);
-  const noGstSale=noGstBills.reduce((s,b)=>s+(b.grandTotal||0),0);
-  const totalSale=gstSale+noGstSale;
-  const totalDue=allBills.reduce((s,b)=>s+(b.dueAmt||0),0);
-  const totalGST=allBills.reduce((s,b)=>s+(b.gstTotal||0),0);
-  const totalBills=allBills.length;
-
-  // PURCHASE
-  const totalPurchase=purchases.reduce((s,p)=>s+(p.total||0),0);
-  const totalPurchaseDue=purchases.reduce((s,p)=>s+(p.due||0),0);
-
-  // PURCHASE by category
-  const catTotals={};
-  purchases.forEach(p=>{
-    if(!catTotals[p.cat])catTotals[p.cat]={total:0};
-    catTotals[p.cat].total+=(p.total||0);
-  });
-
-  // NET
-  const netProfit=totalSale-totalPurchase;
-
-  // TODAY
-  const todayBills=allBills.filter(b=>b.date===today);
-  const todaySale=todayBills.reduce((s,b)=>s+(b.grandTotal||0),0);
-  const todayPurchase=purchases.filter(p=>p.date===today).reduce((s,p)=>s+(p.total||0),0);
-
-  // PER SHOP
-  const shopStats={};
-  shops.forEach(s=>{shopStats[s.id]={name:s.name,bills:0,sale:0,due:0};});
-  allBills.forEach(b=>{
-    const sid=b.shopId;
-    if(!shopStats[sid])shopStats[sid]={name:b.shopName||sid,bills:0,sale:0,due:0};
-    shopStats[sid].bills++;shopStats[sid].sale+=(b.grandTotal||0);shopStats[sid].due+=(b.dueAmt||0);
-  });
-
-  box.innerHTML=`
-    <!-- MAIN STATS -->
-    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">💰 Sales Summary</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-      <div class="dash-stat" style="border-left:4px solid #1565C0">
-        <div class="num" style="color:#1565C0">₹${fmt(gstSale)}</div>
-        <div class="lbl">GST Sale (${gstBills.length} bills)</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #6A1B9A">
-        <div class="num" style="color:#6A1B9A">₹${fmt(noGstSale)}</div>
-        <div class="lbl">Without GST Sale (${noGstBills.length} bills)</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #27ae60">
-        <div class="num" style="color:#27ae60">₹${fmt(totalSale)}</div>
-        <div class="lbl">মোট Sale (${totalBills} bills)</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #C62828">
-        <div class="num" style="color:#C62828">₹${fmt(totalDue)}</div>
-        <div class="lbl">বাকি (Due)</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #F57F17">
-        <div class="num" style="color:#F57F17">₹${fmt(totalGST)}</div>
-        <div class="lbl">মোট GST Amount</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #00897B">
-        <div class="num" style="color:#00897B">₹${fmt(todaySale)}</div>
-        <div class="lbl">আজকের Sale</div>
-      </div>
-    </div>
-
-    <!-- PURCHASE SUMMARY -->
-    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🛒 Purchase Summary</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-      <div class="dash-stat" style="border-left:4px solid #E65100">
-        <div class="num" style="color:#E65100">₹${fmt(totalPurchase)}</div>
-        <div class="lbl">মোট Purchase (${purchases.length}টি)</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #C62828">
-        <div class="num" style="color:#C62828">₹${fmt(totalPurchaseDue)}</div>
-        <div class="lbl">Purchase বাকি</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid #00897B">
-        <div class="num" style="color:#00897B">₹${fmt(todayPurchase)}</div>
-        <div class="lbl">আজকের Purchase</div>
-      </div>
-      <div class="dash-stat" style="border-left:4px solid ${netProfit>=0?'#27ae60':'#C62828'}">
-        <div class="num" style="color:${netProfit>=0?'#27ae60':'#C62828'}">${netProfit>=0?'+':''}₹${fmt(Math.abs(netProfit))}</div>
-        <div class="lbl">${netProfit>=0?'📈 Net Profit':'📉 Net Loss'}</div>
-      </div>
-    </div>
-
-    <!-- SALE VS PURCHASE BAR -->
-    <div style="background:#fff;border-radius:8px;padding:12px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-      <div style="font-weight:700;font-size:.85rem;margin-bottom:8px;color:#1A1208">📊 Sale vs Purchase</div>
-      <div style="margin-bottom:6px">
-        <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span style="color:#27ae60">Sale ₹${fmt(totalSale)}</span><span>${totalSale>0?'100%':'0%'}</span></div>
-        <div style="background:#eee;border-radius:4px;height:10px"><div style="background:#27ae60;height:10px;border-radius:4px;width:100%"></div></div>
-      </div>
-      <div>
-        <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span style="color:#E65100">Purchase ₹${fmt(totalPurchase)}</span><span>${totalSale>0?Math.round(totalPurchase/totalSale*100)+'%':'0%'}</span></div>
-        <div style="background:#eee;border-radius:4px;height:10px"><div style="background:#E65100;height:10px;border-radius:4px;width:${totalSale>0?Math.min(100,Math.round(totalPurchase/totalSale*100)):0}%"></div></div>
-      </div>
-    </div>
-
-    <!-- PURCHASE BY CATEGORY -->
-    ${Object.keys(catTotals).length>0?`
-    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🛒 Category অনুযায়ী খরচ</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
-      ${Object.entries(catTotals).sort((a,b)=>b[1].total-a[1].total).map(([cat,d])=>{
-        const c=CATS.find(x=>x.id===cat)||{icon:"💡",color:"#666",bg:"#eee"};
-        return`<div style="background:${c.bg};border-radius:7px;padding:9px;border-left:3px solid ${c.color}">
-          <div style="font-size:.8rem;font-weight:700;color:${c.color}">${c.icon} ${cat}</div>
-          <div style="font-size:.92rem;font-weight:800;color:#1A1208;margin-top:2px">₹${fmt(d.total)}</div>
-        </div>`;
-      }).join("")}
-    </div>`:''}
-
-    <!-- PER SHOP -->
-    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🏪 দোকান অনুযায়ী Sale</div>
-    ${Object.values(shopStats).filter(s=>s.bills>0).map(s=>`
-      <div class="shop-stat-row">
-        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
-          <div>
-            <div style="font-weight:700;font-size:.92rem">${s.name}</div>
-            <div style="font-size:.78rem;color:#888;margin-top:2px">${s.bills} bills</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-weight:700;color:#27ae60;font-size:.95rem">₹${fmt(s.sale)}</div>
-            ${s.due>0?`<div style="color:#C62828;font-size:.8rem">Due: ₹${fmt(s.due)}</div>`:'<div style="color:#27ae60;font-size:.78rem">✅ All paid</div>'}
-          </div>
-        </div>
-      </div>`).join("")}
-
-    <!-- TODAY'S BILLS -->
-    <div style="margin-top:14px;font-weight:800;color:#1A1208;margin-bottom:8px;font-size:.95rem">📅 আজকের Bills (${today})</div>
-    ${todayBills.length===0?'<p style="color:#888;font-size:.85rem;padding:10px 0">আজকে কোনো bill নেই।</p>':
-    todayBills.map(b=>`<div style="background:#f9f9f9;border-radius:7px;padding:9px 12px;margin-bottom:6px;font-size:.85rem;border-left:3px solid ${b.bType==='GST'?'#1565C0':'#6A1B9A'}">
-      <div style="font-weight:700">${b.invoiceNo} <span style="color:#666;font-weight:400;font-size:.78rem">${b.shopName||''} · ${b.bType}</span></div>
-      <div>👤 ${b.customer?.name||'—'} · <b>₹${fmt(b.grandTotal)}</b></div>
-    </div>`).join("")}`;
-}
-
-// ===== CUSTOMERS =====
-function buildC(){
-  custs={};
-  allBills.forEach(b=>{
-    const k=(b.customer?.nameKey||b.customer?.name||"").toLowerCase().trim();
-    if(!k)return;
-    if(!custs[k])custs[k]={key:k,name:b.customer.name,phone:b.customer.phone,addr:b.customer.addr,state:b.customer.state,code:b.customer.code,gstin:b.customer.gstin,cnt:0,due:0};
-    custs[k].cnt++;custs[k].due+=(b.dueAmt||0);
-  });
-  savedContacts.forEach(c=>{
-    const k=(c.name||"").toLowerCase().trim();
-    if(!custs[k])custs[k]={key:k,name:c.name,phone:c.phone,addr:c.addr,state:c.state,code:c.code,gstin:c.gstin,cnt:0,due:0,savedId:c.id};
-    else{custs[k].phone=custs[k].phone||c.phone;custs[k].gstin=custs[k].gstin||c.gstin;custs[k].savedId=c.id;}
-  });
-}
-
-function renderCustList(){
-  const q=(document.getElementById("custSrch")?.value||"").toLowerCase();
-  let list=savedContacts.map(c=>({...c,fromSaved:true}));
-  Object.values(custs).forEach(c=>{if(!c.savedId&&!list.find(x=>(x.name||"").toLowerCase()===c.key))list.push({...c,fromBill:true});});
-  if(q)list=list.filter(c=>(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)||(c.gstin||"").toLowerCase().includes(q));
-  list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
-  const box=document.getElementById("custListBox");
-  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:30px;color:#888">No customers found</p>`;return;}
-  box.innerHTML=list.map(c=>{
-    const cd=custs[(c.name||"").toLowerCase()];
-    const due=cd?cd.due:0;
-    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid ${due>0?'#eb5757':'#27ae60'}">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
-        <div>
-          <div style="font-weight:800">${c.name}</div>
-          <div style="font-size:.82rem;color:#444">📞 ${c.phone||'—'}${c.gstin?` · 🆔 <b>${c.gstin}</b>`:''}</div>
-          ${c.addr?`<div style="font-size:.78rem;color:#666">📍 ${c.addr}${c.state?' · '+c.state:''}</div>`:''}
-          <div style="font-size:.75rem;color:#888">${cd?cd.cnt:0} bills · ${due>0?`<span style="color:#eb5757;font-weight:700">Due: ₹${due.toLocaleString("en-IN",{maximumFractionDigits:0})}</span>`:'<span style="color:#27ae60">All paid</span>'}</div>
-        </div>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:flex-start">
-          <button class="btn bg btn-sm" onclick="useCustBill('${(c.id||"_"+c.key).replace(/'/g,"\\'")}')">🧾 Bill</button>
-          ${c.id?`<button class="btn binfo btn-sm" onclick="openEditCust('${c.id}')">✏️</button><button class="btn bred btn-sm" onclick="delCust('${c.id}')">🗑️</button>`:'<button class="btn bghost btn-sm" onclick="saveFromBill(\''+c.key+'\')">💾</button>'}
-        </div>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function openAddCust(){
-  ["fc_id","fc_name","fc_phone","fc_addr","fc_state","fc_code","fc_gstin"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-  document.getElementById("custFormTitle").textContent="➕ New Customer";
-  document.getElementById("custFormCard").style.display="block";
-  document.getElementById("custFormCard").scrollIntoView({behavior:"smooth"});
-  setTimeout(()=>document.getElementById("fc_name").focus(),100);
-}
-
-function openEditCust(id){
-  const c=savedContacts.find(x=>x.id===id);if(!c)return;
-  document.getElementById("fc_id").value=id;
-  document.getElementById("fc_name").value=c.name||"";
-  document.getElementById("fc_phone").value=c.phone||"";
-  document.getElementById("fc_addr").value=c.addr||"";
-  document.getElementById("fc_state").value=c.state||"";
-  document.getElementById("fc_code").value=c.code||"";
-  document.getElementById("fc_gstin").value=c.gstin||"";
-  document.getElementById("custFormTitle").textContent="✏️ Edit Customer";
-  document.getElementById("custFormCard").style.display="block";
-  document.getElementById("custFormCard").scrollIntoView({behavior:"smooth"});
-}
-
-function closeCustForm(){document.getElementById("custFormCard").style.display="none";}
-
-async function saveCust(){
-  const name=document.getElementById("fc_name").value.trim();
-  const phone=document.getElementById("fc_phone").value.trim();
-  if(!name||!phone){alert("নাম এবং মোবাইল দিন");return;}
-  const data={name,nameKey:name.toLowerCase(),phone,addr:document.getElementById("fc_addr").value.trim(),state:document.getElementById("fc_state").value.trim(),code:document.getElementById("fc_code").value.trim(),gstin:document.getElementById("fc_gstin").value.trim()};
-  try{
-    const editId=document.getElementById("fc_id").value;
-    if(editId)await window.FB.updateDoc(window.FB.doc(window.FB.db,"contacts",editId),data);
-    else{data.createdAt=window.FB.serverTimestamp();await window.FB.addDoc(window.FB.collection(window.FB.db,"contacts"),data);}
-    closeCustForm();notice("✅ Customer saved!","ok");
-  }catch(e){alert("Error: "+e.message);}
-}
-
-async function delCust(id){
-  if(!confirm("Delete?"))return;
-  try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"contacts",id));}
-  catch(e){alert("Error: "+e.message);}
-}
-
-function useCustBill(idOrKey){
-  let c;
-  if(idOrKey.startsWith("_")){
-    const k=idOrKey.substring(1);
-    const cd=custs[k];if(!cd)return;
-    c={name:cd.name,phone:cd.phone,addr:cd.addr,state:cd.state,code:cd.code,gstin:cd.gstin,due:cd.due};
-  }else{
-    c=savedContacts.find(x=>x.id===idOrKey);
-    if(!c)return;
-    const cd=custs[(c.name||"").toLowerCase()];
-    if(cd)c={...c,due:cd.due};
-  }
-  document.getElementById("cName").value=c.name||"";
-  document.getElementById("cPhone").value=c.phone||"";
-  document.getElementById("cAddr").value=c.addr||"";
-  document.getElementById("cState").value=c.state||"";
-  document.getElementById("cCode").value=c.code||"";
-  document.getElementById("cGstin").value=c.gstin||"";
-  if(c.due>0){
-    document.getElementById("old").value=c.due.toFixed(2);
-    const note=document.getElementById("custNote");
-    note.style.display="block";note.style.background="#FFE0E0";note.style.color="#C62828";
-    note.innerHTML=`⚠️ <b>${c.name}</b> · Due: <b>₹${c.due.toLocaleString("en-IN")}</b>`;
-  }
-  recalc();pg("new");window.scrollTo(0,0);
-  notice("✅ Customer loaded: "+c.name,"ok");
-}
-
-async function saveFromBill(nameKey){
-  const c=custs[nameKey];if(!c)return;
-  try{await window.FB.addDoc(window.FB.collection(window.FB.db,"contacts"),{name:c.name,nameKey:(c.name||"").toLowerCase(),phone:c.phone||"",addr:c.addr||"",state:c.state||"",code:c.code||"",gstin:c.gstin||"",createdAt:window.FB.serverTimestamp()});notice("✅ Saved to contacts!","ok");}
-  catch(e){alert("Error: "+e.message);}
-}
-
-// ===== STOCK =====
-function setStockFilter(f){
-  stockFilter=f;
-  ["all","low","out"].forEach(x=>{const btn=document.getElementById("sf-"+x);if(btn){btn.style.background=x===f?"#1A1208":"#eee";btn.style.color=x===f?"#E8B84B":"#333";}});
-  renderStock();
-}
-
-function renderStock(){
-  const q=(document.getElementById("stockSrch")?.value||"").toLowerCase();
-  let list=[...shopProducts];
-  if(q)list=list.filter(p=>(p.design||"").toLowerCase().includes(q)||(p.size||"").toLowerCase().includes(q));
-  if(stockFilter==="low")list=list.filter(p=>(p.stock||0)>0&&(p.stock||0)<=12);
-  else if(stockFilter==="out")list=list.filter(p=>(p.stock||0)<=0);
-  const box=document.getElementById("stockBox");if(!box)return;
-  const total=shopProducts.length,low=shopProducts.filter(p=>(p.stock||0)>0&&(p.stock||0)<=12).length,out=shopProducts.filter(p=>(p.stock||0)<=0).length;
-  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:30px;color:#888">No products found</p>`;return;}
-  box.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
-    <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#27ae60">${total}</div><div style="font-size:.75rem;color:#555">Total</div></div>
-    <div style="background:#FFF3E0;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#E65100">${low}</div><div style="font-size:.75rem;color:#555">⚠️ Low</div></div>
-    <div style="background:#FFE0E0;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#C62828">${out}</div><div style="font-size:.75rem;color:#555">❌ Out</div></div>
-  </div>`+list.map(p=>{
-    const s=p.stock||0,c=s<=0?"#C62828":s<=12?"#E65100":"#27ae60",bg=s<=0?"#FFE0E0":s<=12?"#FFF3E0":"#E8F5E9";
-    const photos=p.photos||[];
-    const img=photos.length>0?`<img src="${photos[0]}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>`:
-      `<div style="width:48px;height:48px;background:#F0E6C8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${p.type==='বাবা স্যুট'?'👘':'👔'}</div>`;
-    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:10px;margin-bottom:8px;display:flex;gap:10px;align-items:center;border-left:4px solid ${c}">
-      ${img}
-      <div style="flex:1"><div style="font-weight:700;font-size:.9rem">${p.design||'—'} <span style="font-size:.75rem;color:#666">(${p.type||''})</span></div>
-      <div style="font-size:.8rem;color:#444">Size: <b>${p.size||'—'}</b> · ₹${p.price||'—'}</div></div>
-      <div style="text-align:center;background:${bg};padding:8px 12px;border-radius:8px;min-width:65px">
-        <div style="font-size:1.2rem;font-weight:800;color:${c}">${s}</div>
-        <div style="font-size:.65rem;color:${c};font-weight:600">${s<=0?"❌ OUT":s<=12?"⚠️ LOW":"✅ OK"}</div>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-// ===== SETTINGS =====
-async function saveSett(){
-  const np=document.getElementById("sPass").value;
-  const np2=document.getElementById("sPass2").value;
-  if(np&&np!==np2){alert("Password match করছে না!");return;}
-  S={...S,
-    co:document.getElementById("sCo").value,co2:document.getElementById("sCo2").value,
-    own:document.getElementById("sOwn").value,mob:document.getElementById("sMob").value,
-    gstin:document.getElementById("sGst").value,addr:document.getElementById("sAddr").value,
-    bn:document.getElementById("sBN").value,bi:document.getElementById("sBI").value,
-    ba:document.getElementById("sBA").value,bu:document.getElementById("sBU").value,
-    gstPre:document.getElementById("sGSTpre").value,invPre:document.getElementById("sINVpre").value,
-    year:document.getElementById("sYear").value,start:parseInt(document.getElementById("sStart").value)||1
-  };
-  if(np)S.password=np;
-  try{
-    await window.FB.setDoc(window.FB.doc(window.FB.db,"billing_settings","main"),S);
-    alert("✅ Settings saved!");resetInvNo();
-  }catch(e){alert("Error: "+e.message);}
-}
-
-function loadS(d){
-  Object.assign(S,d);
-  const map={"sCo":"co","sCo2":"co2","sOwn":"own","sMob":"mob","sGst":"gstin","sAddr":"addr","sBN":"bn","sBI":"bi","sBA":"ba","sBU":"bu","sGSTpre":"gstPre","sINVpre":"invPre","sYear":"year","sStart":"start"};
-  Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=S[key]||"";});
-}
-
-function notice(msg,type){
-  const n=document.getElementById("notice");if(!n)return;
-  n.className="notice "+type;n.textContent=msg;
-  clearTimeout(n._t);n._t=setTimeout(()=>{n.style.display="none";n.className="notice";},5000);
-}
-
-// Expose globals
-window.doLogin=doLogin;window.doLogout=doLogout;window.showShopScreen=showShopScreen;
-window.selShop=selShop;window.enterShop=enterShop;window.enterDashboard=enterDashboard;window.switchShop=switchShop;
-window.addShopPrompt=addShopPrompt;window.editShop=editShop;window.removeShop=removeShop;
-window.pg=pg;window.setT=setT;window.resetInvNo=resetInvNo;
-window.addItem=addItem;window.updAmt=updAmt;window.rmItem=rmItem;window.recalc=recalc;
-window.checkStock=checkStock;window.setStockFilter=setStockFilter;window.renderStock=renderStock;
-window.autoStateFromGST=autoStateFromGST;window.autoStateForCust=autoStateForCust;
-window.sugCust=sugCust;window.pickC=pickC;
-window.saveInv=saveInv;function openDownloads(){
-  // Try different methods to open downloads
-  const ua=navigator.userAgent.toLowerCase();
-  if(ua.includes("android")){
-    // Android — try to open Downloads via intent
-    try{window.open("content://downloads/public_downloads","_blank");}catch(e){}
-    try{window.open("file:///sdcard/Download/","_blank");}catch(e){}
-    // Show instruction
-    const msg=document.createElement("div");
-    msg.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1208;color:#E8B84B;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:600;text-align:center;max-width:280px;line-height:1.5";
-    msg.innerHTML="📱 Files app খুলুন<br/>→ Downloads folder দেখুন";
-    document.body.appendChild(msg);
-    setTimeout(()=>msg.remove(),3000);
-  }else if(ua.includes("iphone")||ua.includes("ipad")){
-    const msg=document.createElement("div");
-    msg.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1208;color:#E8B84B;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:600;text-align:center;max-width:280px;line-height:1.5";
-    msg.innerHTML="📱 Files app খুলুন<br/>→ On My iPhone → Downloads";
-    document.body.appendChild(msg);
-    setTimeout(()=>msg.remove(),3000);
-  }else{
-    // Desktop
-    window.open("downloads:","_blank")||window.open("file:///C:/Users/"+encodeURIComponent(navigator.userAgent),"_blank");
-    alert("Downloads folder:\nWindows: C:\\Users\\[আপনার নাম]\\Downloads\nMac: ~/Downloads");
-  }
-}
-
-function parseBarcode(val){
-  // Support formats:
-  // "1901-16/18" → design: 1901, size: 16/18
-  // "1901 16/18" → design: 1901, size: 16/18
-  // "1901-20/30" → design: 1901, size: 20/30
-  // "1901" → design: 1901, size: ""
-  val=val.trim();
-  let design=val, size="";
-
-  // Try split by space first (e.g. "1901 20/30")
-  if(val.includes(" ")){
-    const sp=val.split(" ");
-    const last=sp[sp.length-1];
-    if(last.includes("/")||/^(XS|S|M|L|XL|XXL)$/i.test(last)){
-      size=last;
-      design=sp.slice(0,-1).join(" ");
-      return{design,size};
-    }
-  }
-
-  // Try split by dash (e.g. "1901-16/18")
-  if(val.includes("-")){
-    const dp=val.split("-");
-    const last=dp[dp.length-1];
-    if(last.includes("/")||/^(XS|S|M|L|XL|XXL)$/i.test(last)){
-      size=last;
-      design=dp.slice(0,-1).join("-");
-      return{design,size};
-    }
-  }
-
-  return{design,size};
-}
-let scanItemId=null, scanActive=false;
-
-async function startScan(itemId){
-  scanItemId=itemId;
-  scanActive=true;
-  document.getElementById("scanResult").style.display="none";
-  document.getElementById("scanVal").textContent="";
-  document.getElementById("scanLoading").style.display="block";
-  document.getElementById("scanModal").classList.add("open");
-  await new Promise(r=>setTimeout(r,300));
-
-  Quagga.init({
-    inputStream:{
-      name:"Live",type:"LiveStream",
-      target:document.getElementById("scanViewport"),
-      constraints:{facingMode:"environment",width:{ideal:640},height:{ideal:480}}
-    },
-    locator:{patchSize:"medium",halfSample:true},
-    numOfWorkers:2,frequency:10,
-    decoder:{readers:["code_128_reader","ean_reader","ean_8_reader","code_39_reader","upc_reader"]},
-    locate:true
-  },function(err){
-    if(err){alert("Camera চালু হয়নি। Permission দিন।\n"+err.message);stopScan();return;}
-    document.getElementById("scanLoading").style.display="none";
-    Quagga.start();
-  });
-
-  Quagga.onDetected(function(data){
-    if(!scanActive)return;
-    const code=data.result.codeResult.code;
-    if(!code)return;
-    const{design,size}=parseBarcode(code);
-    document.getElementById("scanVal").textContent=code;
-    document.getElementById("scanResult").style.display="block";
-    document.getElementById("scanResult").innerHTML=`✅ <b>Design: ${design}</b>${size?` · <b>Size: ${size}</b>`:''}`;
-    if(navigator.vibrate)navigator.vibrate([100,50,100]);
-    // Auto confirm after 1 second
-    setTimeout(()=>{if(scanActive)confirmScan();},1000);
-  });
-}
-
-function onManualInput(val){
-  if(!val.trim()){document.getElementById("manualResult").style.display="none";return;}
-  const{design,size}=parseBarcode(val);
-  const el=document.getElementById("manualResult");
-  el.style.display="block";
-  el.textContent=`✓ Design: ${design}${size?' · Size: '+size:''}`;
-  document.getElementById("scanVal").textContent=val;
-  document.getElementById("scanResult").style.display="block";
-  document.getElementById("scanResult").innerHTML=`✅ <b>Design: ${design}</b>${size?` · <b>Size: ${size}</b>`:''}`;
-}
-
-function confirmScan(){
-  const manual=(document.getElementById("manualBarcode")?.value||"").trim();
-  const scanned=document.getElementById("scanVal").textContent.trim();
-  const val=manual||scanned;
-  if(!val){notice("❗ Barcode scan করুন অথবা manually লিখুন","err");return;}
-  const{design,size}=parseBarcode(val);
-  if(scanItemId!==null){
-    const designEl=document.getElementById("d-design-"+scanItemId);
-    if(designEl)designEl.value=design;
-    if(size){const sizeEl=document.getElementById("d-size-"+scanItemId);if(sizeEl)sizeEl.value=size;}
-    checkStock(scanItemId);
-    notice(`✅ Design: ${design}${size?' · Size: '+size:''}`, "ok");
-  }
-  stopScan();
-}
-
-function stopScan(){
-  scanActive=false;
-  try{Quagga.stop();}catch(e){}
-  document.getElementById("scanModal").classList.remove("open");
-  const mb=document.getElementById("manualBarcode");if(mb)mb.value="";
-  const mr=document.getElementById("manualResult");if(mr)mr.style.display="none";
-  scanItemId=null;
-}
-
-window.startScan=startScan;window.confirmScan=confirmScan;window.stopScan=stopScan;window.onManualInput=onManualInput;
-window.addEventListener("popstate",()=>{
-  const ovs=["billOv","ewayOv"];
-  for(const id of ovs){
-    const el=document.getElementById(id);
-    if(el){el.remove();return;}
-  }
-  // If on inner page, go to new invoice
-  const active=["list","cust","stock","dash","sett"].find(t=>
-    document.getElementById("pg-"+t)?.style.display==="block"
-  );
-  if(active)pg("new");
-});
-
-// Push state when overlay opens
-function pushState(){history.pushState({overlay:true},"")}
-window.pushState=pushState;window.doPDF=doPDF;window.doPrint=doPrint;window.doWA=doWA;window.openEWay=openEWay;window.newInv=newInv;
-window.renderList=renderList;window.openB=openB;window.loadEdit=loadEdit;window.dlOne=dlOne;window.waOne=waOne;window.delB=delB;
-window.openAddCust=openAddCust;window.openEditCust=openEditCust;window.closeCustForm=closeCustForm;window.saveCust=saveCust;window.delCust=delCust;window.useCustBill=useCustBill;window.saveFromBill=saveFromBill;window.renderCustList=renderCustList;
-window.renderDash=renderDash;window.saveSett=saveSett;
-
-// ===== COSTING CALCULATOR =====
-var cDefaultItems=[
-  {id:"cutting",label:"কাটিং",value:3,group:"general"},
-  {id:"sewing",label:"সেলাই",value:16,group:"general"},
-  {id:"embroidery",label:"এমব্রোটেরি",value:4,group:"general"},
-  {id:"box",label:"বক্স",value:5,group:"general"},
-  {id:"color_iron",label:"কালার ইস্ত্রি",value:0,group:"general"},
-  {id:"color_bukram",label:"কালার বক্রম",value:0,group:"general"},
-  {id:"ticket",label:"টিকিট",value:0,group:"general"},
-  {id:"tag",label:"ট্যাগ",value:0,group:"general"},
-  {id:"pp_paper",label:"PP পেপার",value:0,group:"general"},
-  {id:"pin",label:"পিন",value:0,group:"general"},
-  {id:"clip",label:"ক্লিপ",value:0,group:"general"},
-  {id:"electric",label:"ইলেকট্রিক",value:0,group:"general"},
-  {id:"labour",label:"লেবার চার্জ",value:0,group:"general"},
-  {id:"paper",label:"পেপার",value:2,group:"general"},
-  {id:"button",label:"বোতাম",value:3,group:"general"},
-  {id:"label_cost",label:"লেবেল",value:2,group:"general"},
-  {id:"iron",label:"ইস্ত্রি",value:3,group:"general"},
-  {id:"pant_cutting",label:"প্যান্ট কাটিং",value:0,group:"pant"},
-  {id:"pant_sewing",label:"প্যান্ট সেলাই",value:0,group:"pant"},
-  {id:"pant_embroidery",label:"প্যান্ট এমব্রোটারি",value:0,group:"pant"},
-  {id:"pant_elastic",label:"প্যান্ট ইলাস্টিক",value:0,group:"pant"},
-  {id:"pant_wash",label:"প্যান্ট ওয়াশ",value:0,group:"pant"},
-  {id:"pant_chain",label:"চেইন",value:0,group:"pant"},
-  {id:"pant_pocketing",label:"পোকেটিং",value:0,group:"pant"},
-  {id:"pant_button",label:"বোতাম (প্যান্ট)",value:0,group:"pant"},
-  {id:"pant_ticket",label:"টিকিট (প্যান্ট)",value:0,group:"pant"}
-];
-
-var cItems=JSON.parse(JSON.stringify(cDefaultItems));
-var cSavedDesigns=[];
-
-function cLoadSaved(){
-  try{var r=localStorage.getItem("geeta_designs2");if(r)cSavedDesigns=JSON.parse(r);}catch(e){cSavedDesigns=[];}
-  const el=document.getElementById("cSavedCount");if(el)el.textContent=cSavedDesigns.length;
-}
-
-function cPersist(){
-  try{localStorage.setItem("geeta_designs2",JSON.stringify(cSavedDesigns));}catch(e){}
-  const el=document.getElementById("cSavedCount");if(el)el.textContent=cSavedDesigns.length;
-}
-
-function cGetNum(id){return Number(document.getElementById(id)?.value)||0;}
-function cFmt(n){return Number(n).toFixed(2);}
-
-function cRenderItems(){
-  const gen=cItems.filter(i=>i.group!=="pant");
-  const pant=cItems.filter(i=>i.group==="pant");
-  const rowStyle="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0f2a0f";
-  const inputStyle="background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;width:70px;font-family:inherit;outline:none";
-  function rowHTML(i){
-    return`<div style="${rowStyle}">
-      <div style="flex:1;font-size:14px;font-weight:600;color:#c8e6c9">${i.label}</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="color:#5a7a5a;font-size:12px">৳</span>
-        <input type="number" min="0" value="${i.value}" oninput="cSetItem('${i.id}',this.value)" style="${inputStyle}"/>
-        <button onclick="cRemoveItem('${i.id}')" style="background:rgba(231,76,60,0.15);border:1px solid #5a1e1e;border-radius:4px;color:#e74c3c;font-size:11px;padding:4px 8px;cursor:pointer;font-family:inherit">✕</button>
-      </div>
-    </div>`;
-  }
-  const gi=document.getElementById("cGeneralItems");if(gi)gi.innerHTML=gen.map(rowHTML).join("");
-  const pi=document.getElementById("cPantItems");if(pi)pi.innerHTML=pant.map(rowHTML).join("");
-}
-
-function cSetItem(id,val){
-  cItems.forEach(i=>{if(i.id===id)i.value=Number(val)||0;});
-  cCalc();
-}
-
-function cRemoveItem(id){
-  cItems=cItems.filter(i=>i.id!==id);
-  cRenderItems();cCalc();
-}
-
-function cAddItem(){
-  const name=document.getElementById("cNewItemName").value.trim();
-  if(!name)return;
-  cItems.push({id:"c_"+Date.now(),label:name,value:Number(document.getElementById("cNewItemValue").value)||0,group:"general"});
-  document.getElementById("cNewItemName").value="";
-  document.getElementById("cNewItemValue").value="";
-  cRenderItems();cCalc();
-}
-
-function cSyncProfit(v){const el=document.getElementById("cProfit");if(el)el.value=v;cCalc();}
-function cSyncProfitNum(v){const el=document.getElementById("cProfitRange");if(el)el.value=v;cCalc();}
-
-function cCalc(){
-  const fabricCost=(cGetNum("cFabricPrice")*cGetNum("cFabricMeters"))/(cGetNum("cPiecesPerRoll")||1);
-  const pantFabricCost=(cGetNum("cPantFabricPrice")*cGetNum("cPantFabricMeters"))/(cGetNum("cPantPieces")||1);
-  const generalTotal=cItems.filter(i=>i.group!=="pant").reduce((s,i)=>s+Number(i.value||0),0);
-  const pantItemTotal=cItems.filter(i=>i.group==="pant").reduce((s,i)=>s+Number(i.value||0),0);
-  const pantTotal=pantItemTotal+pantFabricCost;
-  const total=fabricCost+generalTotal+pantTotal;
-  const profitPct=cGetNum("cProfit");
-  const profitAmt=total*profitPct/100;
-  const selling=total+profitAmt;
-  const pieces=cGetNum("cPiecesPerRoll")||1;
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
-  set("cFabricCost",cFmt(fabricCost));
-  set("cPantFabricCost",cFmt(pantFabricCost));
-  set("cGeneralTotal",cFmt(generalTotal));
-  set("cPantTotal",cFmt(pantTotal));
-  set("cSFabric",cFmt(fabricCost));
-  set("cSGeneral",cFmt(generalTotal));
-  set("cSPant",cFmt(pantTotal));
-  set("cSTotal",cFmt(total));
-  set("cSProfit",cFmt(profitAmt));
-  set("cSProfitPct",profitPct);
-  set("cSSelling",cFmt(selling));
-  set("cBatchN",pieces);
-  set("cBatchCost",cFmt(total*pieces));
-  set("cBatchSell",cFmt(selling*pieces));
-  set("cBatchProfit",cFmt(profitAmt*pieces));
-  const dn=(document.getElementById("cDesignNo")?.value||"").trim();
-  const tag=document.getElementById("cSummaryDesign");
-  if(tag){tag.textContent=dn?"#"+dn:"";tag.style.display=dn?"inline-block":"none";}
-}
-
-function cSaveDesign(){
-  const dn=(document.getElementById("cDesignNo")?.value||"").trim();
-  if(!dn){cFlash("⚠ আগে ডিজাইন নম্বর দিন",false);return;}
-  const record={
-    designNo:dn,
-    fabricPrice:cGetNum("cFabricPrice"),fabricMeters:cGetNum("cFabricMeters"),piecesPerRoll:cGetNum("cPiecesPerRoll"),
-    pantFabricPrice:cGetNum("cPantFabricPrice"),pantFabricMeters:cGetNum("cPantFabricMeters"),pantPieces:cGetNum("cPantPieces"),
-    items:JSON.parse(JSON.stringify(cItems)),profit:cGetNum("cProfit"),
-    total:document.getElementById("cSTotal")?.textContent||"0",
-    selling:document.getElementById("cSSelling")?.textContent||"0"
-  };
-  cSavedDesigns=cSavedDesigns.filter(d=>d.designNo!==dn);
-  cSavedDesigns.unshift(record);
-  cPersist();cFlash("✓ সেভ হয়েছে",true);cRenderSavedList();
-}
-
-function cRenderSavedList(){
-  const box=document.getElementById("cSavedList");if(!box)return;
-  if(!cSavedDesigns.length){box.innerHTML='<div style="color:#5a7a5a;font-size:13px;text-align:center;padding:8px 0">এখনো কোনো ডিজাইন সেভ করা হয়নি</div>';return;}
-  box.innerHTML=cSavedDesigns.map(d=>`
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:8px;background:rgba(155,89,182,0.07);border-radius:8px;border:1px solid #2d2a3a">
-      <div style="flex:1;cursor:pointer" onclick="cLoadDesign('${d.designNo}')">
-        <div style="font-size:15px;font-weight:800;color:#c39bd3">${d.designNo}</div>
-        <div style="font-size:11px;color:#6b9e7e">খরচ ৳${d.total} · বিক্রয় ৳${d.selling}</div>
-      </div>
-      <button onclick="cLoadDesign('${d.designNo}')" style="background:rgba(46,204,113,0.15);border:1px solid #1e4a1e;border-radius:5px;color:#2ecc71;font-size:12px;font-weight:700;padding:5px 10px;margin-right:8px;cursor:pointer;font-family:inherit">খুলুন</button>
-      <button onclick="cDeleteDesign('${d.designNo}')" style="background:rgba(231,76,60,0.15);border:1px solid #5a1e1e;border-radius:4px;color:#e74c3c;font-size:11px;padding:4px 8px;cursor:pointer;font-family:inherit">✕</button>
-    </div>`).join("");
-}
-
-function cToggleSaved(){
-  const box=document.getElementById("cSavedList");if(!box)return;
-  if(box.style.display==="none"||box.style.display===""){cRenderSavedList();box.style.display="block";}
-  else box.style.display="none";
-}
-
-function cLoadDesign(dn){
-  const d=cSavedDesigns.find(x=>x.designNo===dn);if(!d)return;
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
-  set("cDesignNo",d.designNo);
-  set("cFabricPrice",d.fabricPrice);set("cFabricMeters",d.fabricMeters);set("cPiecesPerRoll",d.piecesPerRoll);
-  set("cPantFabricPrice",d.pantFabricPrice||0);set("cPantFabricMeters",d.pantFabricMeters||0);set("cPantPieces",d.pantPieces||1);
-  set("cProfit",d.profit);set("cProfitRange",d.profit);
-  cItems=JSON.parse(JSON.stringify(d.items));
-  document.getElementById("cSavedList").style.display="none";
-  cRenderItems();cCalc();cFlash("✓ "+d.designNo+" খোলা হয়েছে",true);
-}
-
-function cDeleteDesign(dn){
-  cSavedDesigns=cSavedDesigns.filter(d=>d.designNo!==dn);
-  cPersist();cRenderSavedList();
-}
-
-function cFlash(msg,ok){
-  const el=document.getElementById("cSaveStatus");if(!el)return;
-  el.textContent=msg;el.style.display="block";
-  el.style.background=ok?"rgba(46,204,113,0.15)":"rgba(243,156,18,0.15)";
-  el.style.color=ok?"#2ecc71":"#f39c12";
-  setTimeout(()=>el.style.display="none",2500);
-}
-
-window.cCalc=cCalc;window.cSyncProfit=cSyncProfit;window.cSyncProfitNum=cSyncProfitNum;
-window.cSetItem=cSetItem;window.cRemoveItem=cRemoveItem;window.cAddItem=cAddItem;
-window.cSaveDesign=cSaveDesign;window.cToggleSaved=cToggleSaved;window.cLoadDesign=cLoadDesign;window.cDeleteDesign=cDeleteDesign;
-cLoadSaved();
-
-function openGeetaWeb(){
-  document.getElementById("geetaWebModal").style.display="block";
-}
-window.openGeetaWeb=openGeetaWeb;
-const CATS=[
-  {id:"কাপড় কেনা",icon:"🧵",color:"#1565C0",bg:"#E3F2FD"},
-  {id:"দর্জি খরচ",icon:"✂️",color:"#6A1B9A",bg:"#F3E5F5"},
-  {id:"কাটিং খরচ",icon:"✂️",color:"#00838F",bg:"#E0F7FA"},
-  {id:"আয়রন খরচ",icon:"🔥",color:"#BF360C",bg:"#FBE9E7"},
-  {id:"বোতাম/শ্রমিক",icon:"🪡",color:"#558B2F",bg:"#F1F8E9"},
-  {id:"ইলেকট্রিক বিল",icon:"⚡",color:"#F9A825",bg:"#FFFDE7"},
-  {id:"এমব্রয়ডারি",icon:"🎨",color:"#E65100",bg:"#FFF3E0"},
-  {id:"বাক্স/প্যাকেজিং",icon:"📦",color:"#2E7D32",bg:"#E8F5E9"},
-  {id:"ট্রান্সপোর্ট",icon:"🚚",color:"#1976D2",bg:"#E3F2FD"},
-  {id:"প্রিন্টিং/লেবেল",icon:"🖨️",color:"#C62828",bg:"#FFE0E0"},
-  {id:"বেতন/শ্রমিক",icon:"👷",color:"#F57F17",bg:"#FFFDE7"},
-  {id:"অন্যান্য",icon:"💡",color:"#37474F",bg:"#ECEFF1"}
-];
-
-let purchases=[];
-let selCat=CATS[0].id;
-
-function initCatGrid(){
-  const g=document.getElementById("catGrid");
-  if(!g)return;
-  g.innerHTML=CATS.map(c=>`
-    <div onclick="selCategory('${c.id}')" id="cat-${c.id.replace(/\//g,'-')}"
-      style="background:${selCat===c.id?c.color:c.bg};color:${selCat===c.id?'#fff':c.color};border:2px solid ${c.color};border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s">
-      <div style="font-size:1.5rem">${c.icon}</div>
-      <div style="font-size:.75rem;font-weight:700;margin-top:3px">${c.id}</div>
-    </div>`).join("");
-  document.getElementById("pCat").value=selCat;
-  document.getElementById("pDate").value=new Date().toISOString().slice(0,10);
-}
-
-function selCategory(id){
-  selCat=id;
-  initCatGrid();
-}
-
-function calcPurchase(){
-  const qty=parseFloat(document.getElementById("pQty").value)||0;
-  const rate=parseFloat(document.getElementById("pRate").value)||0;
-  const totalEl=document.getElementById("pTotal");
-  const paidEl=document.getElementById("pPaid");
-  const dueEl=document.getElementById("pDue");
-  // If qty and rate given, calc total
-  if(qty>0&&rate>0)totalEl.value=(qty*rate).toFixed(2);
-  const total=parseFloat(totalEl.value)||0;
-  const paid=parseFloat(paidEl.value)||0;
-  dueEl.value=(total-paid).toFixed(2);
-}
-
-async function savePurchase(){
-  const cat=document.getElementById("pCat").value;
-  const desc=document.getElementById("pDesc").value.trim();
-  const total=parseFloat(document.getElementById("pTotal").value)||0;
-  if(!cat){showPMsg("❗ Category select করুন","err");return;}
-  if(!total){showPMsg("❗ মোট টাকা দিন","err");return;}
-  const data={
-    cat,
-    desc,
-    supplier:document.getElementById("pSupplier").value.trim(),
-    date:document.getElementById("pDate").value,
-    qty:parseFloat(document.getElementById("pQty").value)||0,
-    rate:parseFloat(document.getElementById("pRate").value)||0,
-    total,
-    paid:parseFloat(document.getElementById("pPaid").value)||0,
-    due:parseFloat(document.getElementById("pDue").value)||0,
-    note:document.getElementById("pNote").value.trim(),
-    shopId:currentShop?.id||"",
-    shopName:currentShop?.name||"",
-    createdAt:new Date().toISOString()
-  };
-  try{
-    await window.FB.addDoc(window.FB.collection(window.FB.db,"purchases"),{...data,ts:window.FB.serverTimestamp()});
-    // Reset form
-    ["pDesc","pSupplier","pQty","pRate","pTotal","pPaid","pNote"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-    document.getElementById("pDue").value="";
-    showPMsg("✅ Purchase save হয়েছে!","ok");
-  }catch(e){
-    showPMsg("❌ Error: "+e.message,"err");
-  }
-}
-
-function renderPurchase(){
-  const f=document.getElementById("pFilter")?.value||"all";
-  let list=f==="all"?[...purchases]:purchases.filter(p=>p.cat===f);
-  list.sort((a,b)=>b.date?.localeCompare(a.date||"")||0);
-
-  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:0});
-  const totalSpent=list.reduce((s,p)=>s+(p.total||0),0);
-  const totalDue=list.reduce((s,p)=>s+(p.due||0),0);
-
-  // Summary by category
-  const catTotals={};
-  purchases.forEach(p=>{
-    if(!catTotals[p.cat])catTotals[p.cat]={total:0,due:0};
-    catTotals[p.cat].total+=(p.total||0);
-    catTotals[p.cat].due+=(p.due||0);
-  });
-
-  document.getElementById("purchaseSummary").innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:1.2rem;font-weight:800;color:#2E7D32">₹${fmt(totalSpent)}</div>
-        <div style="font-size:.75rem;color:#555">মোট খরচ</div>
-      </div>
-      <div style="background:#FFE0E0;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:1.2rem;font-weight:800;color:#C62828">₹${fmt(totalDue)}</div>
-        <div style="font-size:.75rem;color:#555">বাকি পরিমাণ</div>
-      </div>
-    </div>
-    ${f==="all"?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
-      ${CATS.filter(c=>catTotals[c.id]).map(c=>`
-        <div style="background:${c.bg};border-radius:7px;padding:9px;border-left:4px solid ${c.color}">
-          <div style="font-size:.82rem;font-weight:700;color:${c.color}">${c.icon} ${c.id}</div>
-          <div style="font-size:.9rem;font-weight:800;color:#1A1208;margin-top:2px">₹${fmt(catTotals[c.id].total)}</div>
-          ${catTotals[c.id].due>0?`<div style="font-size:.75rem;color:#C62828">বাকি: ₹${fmt(catTotals[c.id].due)}</div>`:''}
-        </div>`).join("")}
-    </div>`:''  }`;
-
-  const box=document.getElementById("purchaseList");
-  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:20px;color:#888">কোনো purchase নেই</p>`;return;}
-
-  box.innerHTML=list.map(p=>{
-    const cat=CATS.find(c=>c.id===p.cat)||{icon:"💡",color:"#666",bg:"#eee"};
-    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid ${cat.color}">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
-        <div>
-          <div style="font-weight:700;font-size:.9rem">${cat.icon} ${p.cat}
-            ${p.shopName?`<span style="font-size:.7rem;color:#888;font-weight:400"> · ${p.shopName}</span>`:''}
-          </div>
-          <div style="font-size:.85rem;color:#444;margin-top:2px">${p.desc||'—'}${p.supplier?' · '+p.supplier:''}</div>
-          <div style="font-size:.75rem;color:#888;margin-top:2px">📅 ${p.date||'—'}${p.qty?` · ${p.qty} × ₹${p.rate}`:''}</div>
-          ${p.note?`<div style="font-size:.75rem;color:#666;margin-top:2px;font-style:italic">${p.note}</div>`:''}
-        </div>
-        <div style="text-align:right">
-          <div style="font-weight:800;color:#27ae60;font-size:1rem">₹${fmt(p.total)}</div>
-          ${p.due>0?`<div style="color:#C62828;font-size:.8rem;font-weight:700">বাকি: ₹${fmt(p.due)}</div>`:`<div style="color:#27ae60;font-size:.78rem">✅ পরিশোধ</div>`}
-        </div>
-      </div>
-    </div>`;
-  }).join("");
-}
-
-function showPMsg(msg,type){
-  const n=document.getElementById("pMsg");
-  if(!n)return;
-  n.className="notice "+type;n.textContent=msg;
-  clearTimeout(n._t);n._t=setTimeout(()=>{n.style.display="none";n.className="notice";},4000);
-}
-
-window.selCategory=selCategory;window.calcPurchase=calcPurchase;window.savePurchase=savePurchase;window.renderPurchase=renderPurchase;
-
-// ===== FIREBASE INIT =====
-window.addEventListener("fbOK",()=>{
-  // All bills
-  window.FB.onSnapshot(window.FB.query(window.FB.collection(window.FB.db,"bills"),window.FB.orderBy("createdAt","desc")),snap=>{
-    allBills=[];snap.forEach(d=>allBills.push({id:d.id,...d.data()}));
-    bills=currentShop?allBills.filter(b=>b.shopId===currentShop.id):allBills;
-    buildC();resetInvNo();renderList();
-  });
-  // Settings
-  window.FB.onSnapshot(window.FB.doc(window.FB.db,"billing_settings","main"),d=>{
-    if(d.exists()){loadS(d.data());if(d.data().password)S.password=d.data().password;}
-  });
-  // Shops
-  window.FB.onSnapshot(window.FB.doc(window.FB.db,"billing_settings","shops"),d=>{
-    if(d.exists()&&d.data().shops){shops=d.data().shops;renderShopGrid();renderShopMgmt();}
-  });
-  // Contacts
-  window.FB.onSnapshot(window.FB.collection(window.FB.db,"contacts"),snap=>{
-    savedContacts=[];snap.forEach(d=>savedContacts.push({id:d.id,...d.data()}));
-    buildC();renderCustList();
-  });
-  // Products (stock)
-  window.FB.onSnapshot(window.FB.collection(window.FB.db,"products"),snap=>{
-    shopProducts=[];snap.forEach(d=>shopProducts.push({id:d.id,...d.data()}));
-    renderStock();itemIds.forEach(id=>checkStock(id));
-  });
-  // Purchases
-  window.FB.onSnapshot(window.FB.query(window.FB.collection(window.FB.db,"purchases"),window.FB.orderBy("ts","desc")),snap=>{
-    purchases=[];snap.forEach(d=>purchases.push({id:d.id,...d.data()}));
-    renderPurchase();
-  });
-});
-
-// INIT
-document.getElementById("bDate").value=new Date().toISOString().slice(0,10);
-document.getElementById("pwInput").focus();
-</script>
-</body>
-</html>
+// ===== OWNER
