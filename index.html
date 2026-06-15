@@ -1,0 +1,2564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>M GEETA SUPER — Invoice System</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+<style>
+/* SCANNER MODAL */
+#scanModal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.9);z-index:400;flex-direction:column;align-items:center;justify-content:center}
+#scanModal.open{display:flex}
+#scanModal .sm-box{background:#1A1208;border-radius:14px;padding:18px;width:92%;max-width:400px;text-align:center}
+#scanModal h3{color:#E8B84B;font-size:1rem;font-weight:700;margin-bottom:12px}
+#scanModal video{width:100%;border-radius:10px;border:3px solid #C8932A;max-height:260px;object-fit:cover}
+#scanModal .scan-line{height:3px;background:#C8932A;border-radius:2px;margin:8px 0;animation:scanAnim 1.5s infinite}
+@keyframes scanAnim{0%,100%{opacity:.3}50%{opacity:1}}
+#scanModal .sm-result{background:rgba(200,147,42,.15);border:1px solid rgba(200,147,42,.4);border-radius:7px;padding:9px;color:#E8B84B;font-size:.88rem;font-weight:600;margin:10px 0;display:none}
+#scanModal .sm-btns{display:flex;gap:8px;margin-top:10px}
+#scanModal .sm-btns button{flex:1;padding:10px;border:none;border-radius:7px;font-weight:700;cursor:pointer;font-family:inherit;font-size:.85rem}
+#scanModal .sm-ok{background:#C8932A;color:#1A1208}
+#scanModal .sm-cancel{background:rgba(255,255,255,.1);color:#F0E6C8}
+#scanModal .sm-tip{color:rgba(240,230,200,.6);font-size:.75rem;margin-top:8px}
+</style>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0f2f5;font-family:'Inter',sans-serif;min-height:100vh;color:#1a1a1a;padding-bottom:30px}
+
+/* LOGIN SCREEN */
+#loginScreen{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(135deg,#1A1208 0%,#3A2A10 100%);
+  display:flex;align-items:center;justify-content:center;
+  z-index:999;padding:20px;
+}
+.login-box{background:#fff;border-radius:16px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo h1{font-size:1.6rem;font-weight:800;color:#1A1208}
+.login-logo p{color:#888;font-size:.85rem;margin-top:4px}
+.login-box input{width:100%;padding:13px 14px;border:2px solid #ddd;border-radius:8px;font-size:1rem;font-family:inherit;outline:none;margin-bottom:12px;text-align:center;letter-spacing:.2em;font-weight:700}
+.login-box input:focus{border-color:#C8932A}
+.login-btn{width:100%;background:#C8932A;color:#1A1208;border:none;padding:14px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;letter-spacing:.05em}
+.login-err{color:#C62828;font-size:.82rem;text-align:center;margin-top:8px;display:none}
+
+/* SHOP SELECT SCREEN */
+#shopScreen{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(135deg,#1A1208 0%,#3A2A10 100%);
+  display:none;align-items:center;justify-content:center;
+  z-index:998;padding:16px;overflow-y:auto;
+}
+.shop-box{background:#fff;border-radius:16px;padding:24px;width:100%;max-width:480px}
+.shop-box h2{font-size:1.1rem;font-weight:800;color:#1A1208;margin-bottom:6px}
+.shop-box p{color:#666;font-size:.82rem;margin-bottom:18px}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.shop-card{background:#FFF7E0;border:2px solid #e0e0e0;border-radius:10px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .15s}
+.shop-card:hover,.shop-card.sel{background:#C8932A;border-color:#C8932A;color:#1A1208}
+.shop-card:hover .sc-icon,.shop-card.sel .sc-icon{filter:none}
+.sc-icon{font-size:2rem;margin-bottom:6px}
+.sc-name{font-weight:700;font-size:.88rem}
+.sc-loc{font-size:.72rem;color:#888;margin-top:2px}
+.shop-card.sel .sc-loc{color:#5D4037}
+.add-shop-btn{width:100%;background:#f0f0f0;border:2px dashed #ccc;border-radius:10px;padding:14px;cursor:pointer;font-weight:600;color:#666;font-family:inherit;font-size:.88rem;margin-bottom:14px}
+.add-shop-btn:hover{border-color:#C8932A;color:#C8932A}
+.go-btn{width:100%;background:#1A1208;color:#E8B84B;border:none;padding:14px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit}
+.go-btn:disabled{opacity:.4;cursor:not-allowed}
+.owner-link{text-align:center;margin-top:12px}
+.owner-link button{background:none;border:none;color:#C8932A;font-size:.82rem;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:underline}
+
+/* HEADER */
+.hdr{background:#1A1208;padding:10px 14px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hdr-in{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.hdr-left{display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:.95rem;color:#E8B84B}
+.logo small{color:#F0E6C8;font-weight:400;font-size:.65rem;display:block}
+.shop-badge{background:#C8932A;color:#1A1208;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;cursor:pointer}
+.htabs{display:flex;gap:3px;flex-wrap:wrap}
+.htab{background:rgba(200,147,42,.15);color:#E8B84B;border:none;padding:6px 11px;border-radius:20px;font-size:.75rem;font-weight:600;cursor:pointer;font-family:inherit}
+.htab.on{background:#C8932A;color:#1A1208}
+.logout-btn{background:rgba(255,255,255,.1);color:#F0E6C8;border:none;padding:6px 10px;border-radius:6px;font-size:.72rem;cursor:pointer;font-family:inherit}
+
+.wrap{max-width:960px;margin:0 auto;padding:12px}
+.card{background:#fff;border-radius:10px;padding:14px;margin-bottom:12px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.ct{font-weight:700;font-size:.92rem;margin-bottom:10px;color:#1A1208;padding-bottom:8px;border-bottom:2px solid #FFF7E0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ct .r{margin-left:auto}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+
+.f{display:flex;flex-direction:column}
+.f label{font-size:.67rem;font-weight:700;color:#666;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
+.f input,.f select,.f textarea{padding:9px 10px;border:1.5px solid #d8d8d8;border-radius:6px;font-family:'Inter',sans-serif;font-size:.9rem;outline:none;background:#fafafa;width:100%}
+.f input:focus,.f select:focus{border-color:#C8932A;background:#fff}
+.f textarea{resize:vertical;min-height:50px}
+
+.inv-no-wrap{display:flex;gap:4px;align-items:flex-end}
+.inv-no-wrap input{flex:1}
+.inv-no-wrap button{padding:9px 12px;background:#C8932A;color:#1A1208;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.8rem;white-space:nowrap;font-family:inherit}
+.inv-note{font-size:.67rem;color:#888;margin-top:2px}
+
+.tog{display:flex;gap:4px;background:#f0f0f0;padding:4px;border-radius:8px}
+.tog button{flex:1;padding:8px;border:none;background:transparent;border-radius:5px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem;color:#666}
+.tog button.on{background:#C8932A;color:#1A1208}
+
+.sug-wrap{position:relative}
+.sug-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid #C8932A;border-top:none;border-radius:0 0 7px 7px;max-height:180px;overflow-y:auto;z-index:60;box-shadow:0 4px 12px rgba(0,0,0,.12);display:none}
+.sug-list.open{display:block}
+.sug-item{padding:9px 11px;cursor:pointer;border-bottom:1px solid #f0e6c8;font-size:.84rem}
+.sug-item:hover{background:#FFF7E0}
+.sug-item strong{display:block;color:#1A1208}
+.sug-item small{color:#666;font-size:.74rem}
+
+.item-card{background:#f9f9f9;border:1.5px solid #e0e0e0;border-left:4px solid #C8932A;border-radius:8px;padding:12px;margin-bottom:10px}
+.item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.item-num{font-weight:700;color:#555;font-size:.82rem;background:#FFF7E0;padding:3px 10px;border-radius:12px}
+.item-amt-show{font-size:1.05rem;font-weight:800;color:#C8932A}
+
+.totals-box{background:#FFF7E0;border-radius:8px;padding:12px;border:2px solid #C8932A}
+.trow{display:flex;justify-content:space-between;padding:5px 0;font-size:.9rem;border-bottom:1px solid rgba(200,147,42,.15)}
+.trow:last-child{border-bottom:none}
+.trow.grand{font-size:1.15rem;font-weight:800;color:#1A1208;border-top:2px solid #C8932A;border-bottom:none;padding-top:10px;margin-top:6px}
+
+.btn{padding:10px 16px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-family:inherit;font-size:.88rem;display:inline-flex;align-items:center;gap:6px;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.bg{background:#27ae60;color:#fff}
+.bpdf{background:#f39c12;color:#fff}
+.bwa{background:#25D366;color:#fff}
+.bprint{background:#1976D2;color:#fff}
+.bghost{background:#eee;color:#333}
+.bred{background:#eb5757;color:#fff}
+.bprim{background:#C8932A;color:#1A1208}
+.binfo{background:#1976D2;color:#fff}
+.btn-sm{padding:6px 10px;font-size:.78rem}
+.btn-block{width:100%}
+.actg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.actg .s2{grid-column:1/-1}
+
+.copy-info{background:#E3F2FD;border:1px solid #1976D2;border-radius:7px;padding:9px 12px;font-size:.82rem;color:#1565C0;margin-bottom:12px}
+.copy-info strong{display:block;margin-bottom:3px;font-size:.88rem}
+
+.notice{padding:10px 14px;border-radius:7px;margin-bottom:12px;font-size:.88rem;display:none}
+.ok{background:#E8F5E9;color:#2E7D32;border:1px solid #a5d6a7;display:block}
+.err{background:#FFE0E0;color:#C62828;border:1px solid #ef9a9a;display:block}
+.info{background:#E3F2FD;color:#1565C0;border:1px solid #90caf9;display:block}
+
+.badge{display:inline-block;font-size:.67rem;padding:2px 7px;border-radius:10px;font-weight:600;margin-left:3px}
+.bgst{background:#E3F2FD;color:#1565C0}
+.binv{background:#FCE4EC;color:#C2185B}
+.bdue{background:#FFE0E0;color:#C62828}
+.bpaid{background:#E8F5E9;color:#2E7D32}
+
+.sw{position:relative;margin-bottom:12px}
+.sw input{width:100%;padding:10px 14px 10px 36px;border:2px solid #ddd;border-radius:8px;font-size:.9rem;font-family:inherit;outline:none}
+.sw input:focus{border-color:#C8932A}
+.sw::before{content:"🔍";position:absolute;left:11px;top:50%;transform:translateY(-50%)}
+.bill-row{background:#fff;border:1.5px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
+.bill-row:hover{border-color:#C8932A;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+
+/* OWNER DASHBOARD */
+.dash-stat{background:#fff;border-radius:10px;padding:14px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.dash-stat .num{font-size:1.6rem;font-weight:800;margin-bottom:3px}
+.dash-stat .lbl{font-size:.75rem;color:#666}
+.shop-stat-row{background:#fff;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid #C8932A;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+
+/* A4 */
+#billWrap{position:fixed;left:-9999px;top:0;width:794px;background:#fff;z-index:-1}
+.bill-a4{width:794px;background:#fff;color:#000;font-family:'Inter',Arial,sans-serif;font-size:9.5pt;line-height:1.3;padding:8mm 7mm 7mm 7mm;page-break-after:always}
+.bill-a4:last-child{page-break-after:avoid}
+.bh{display:grid;grid-template-columns:1fr 1fr;border:2px solid #000}
+.bh>div{padding:7px 10px}
+.bh>div:first-child{border-right:1px solid #000}
+.bshop-main{font-size:16pt;font-weight:800;text-decoration:underline;letter-spacing:.04em;line-height:1.1}
+.bshop-sub{font-size:9pt;font-weight:600;color:#444;margin-top:2px;letter-spacing:.06em}
+.bshop-sub span{font-weight:700;color:#000}
+.binfo{font-size:8pt;line-height:1.5;margin-top:3px;color:#000 !important;background:#fff !important}
+.bivtbl{width:100%;border-collapse:collapse;margin-top:5px;font-size:8.5pt}
+.bivtbl td{border:1px solid #000;padding:3px 5px}
+.bivtbl td:first-child{font-weight:700;width:45%}
+.brcv{display:grid;grid-template-columns:1fr 1fr;border:2px solid #000;border-top:none}
+.brcv>div{padding:5px 8px;border-right:1px solid #000;font-size:8.5pt}
+.brcv>div:last-child{border-right:none}
+.brcv .brh{background:#000;color:#fff;font-weight:700;text-align:center;padding:4px;font-size:8pt}
+.brcv .brh:nth-child(2){border-right:none}
+.brcv .brr{display:flex;gap:3px;margin-bottom:2px;font-size:8.5pt}
+.brcv .brr b{min-width:66px;display:inline-block;font-size:8pt}
+.bitbl{width:100%;border-collapse:collapse;border:2px solid #000;border-top:none}
+.bitbl th{background:#f0f0f0;border:1px solid #000;padding:4px 3px;text-align:center;font-size:7.5pt;font-weight:700;line-height:1.2}
+.bitbl td{border:1px solid #000;padding:3px 4px;text-align:center;height:19px;font-size:8.5pt}
+.bitbl td.tl{text-align:left}
+.bitbl td.tr{text-align:right;font-weight:600}
+.bfoot{display:grid;grid-template-columns:1fr 1fr;border:2px solid #000;border-top:none}
+.bfoot>div{padding:6px 9px;border-right:1px solid #000;font-size:8.5pt}
+.bfoot>div:last-child{border-right:none}
+.bfoot table{width:100%;border-collapse:collapse}
+.bfoot td{padding:2.5px 5px;font-size:8.5pt;border-bottom:1px solid #ddd}
+.bfoot td:first-child{font-weight:700}
+.bfoot td:last-child{text-align:right;font-weight:600}
+.bfoot .bfg{background:#fff;font-size:10pt;font-weight:800;border-top:2px solid #000}
+.bfoot .bfd{color:#000;font-weight:800}
+.bbank{border:1px solid #000;padding:5px 8px;margin-top:6px;font-size:8pt;line-height:1.6}
+.bcond{border:2px solid #000;border-top:none;padding:5px 10px;font-size:7.5pt;line-height:1.55}
+.bwords{border:2px solid #000;border-top:none;padding:5px 10px;font-size:8.5pt;font-style:italic;font-weight:600}
+.bsig{border:2px solid #000;border-top:none;padding:10px;display:flex;justify-content:space-between;align-items:flex-end;font-size:8.5pt}
+.bsig .bcert{flex:1;font-weight:600;font-size:8pt;line-height:1.4;max-width:60%}
+.bsigbox{text-align:center}
+.bsigline{border-top:1px solid #000;width:160px;margin-top:24px;padding-top:3px;font-size:8pt}
+.copy-label{background:#000;color:#fff;text-align:center;font-weight:800;font-size:10pt;padding:4px 8px;letter-spacing:.15em}
+
+/* B&W style for all bill copies */
+.bw-copy{filter:grayscale(100%) contrast(1.1)}
+.bw-copy *{color:#000 !important;background:#fff !important;border-color:#000 !important}
+.bw-copy .copy-label{background:#000 !important;color:#fff !important}
+.bw-copy .binfo{background:#fff !important;color:#000 !important}
+.bw-copy th{background:#e0e0e0 !important;color:#000 !important}
+.bw-copy .bshop-main{color:#000 !important}
+
+@media print{
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  body,html{background:#fff;padding:0;margin:0}
+  .hdr,.wrap{display:none !important}
+  #loginScreen,#shopScreen{display:none !important}
+  #billWrap{position:static;left:0;width:210mm;z-index:auto}
+  .bill-a4{width:210mm;min-height:297mm;padding:7mm 6mm}
+  .bw-copy{filter:grayscale(100%) contrast(1.05) !important}
+  .bw-copy *{color:#000 !important;background:white !important}
+  .bw-copy .copy-label{background:#000 !important;color:#fff !important}
+  @page{size:A4 portrait;margin:0}
+}
+@media(max-width:520px){
+  .g2,.g3,.g4{grid-template-columns:1fr 1fr}
+  .actg{grid-template-columns:1fr}
+  .actg .s2{grid-column:1}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>M GEETA SUPER</h1>
+      <p>Invoice System · 2026-27</p>
+    </div>
+    <input id="pwInput" type="password" placeholder="Password দিন" maxlength="20"
+      onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">🔐 Login করুন</button>
+    <div class="login-err" id="loginErr">❌ Password ভুল! আবার চেষ্টা করুন।</div>
+  </div>
+</div>
+
+<!-- SHOP SELECT SCREEN -->
+<div id="shopScreen">
+  <div class="shop-box">
+    <h2>👋 স্বাগতম!</h2>
+    <p>কোন দোকান থেকে বিল করছেন?</p>
+    <div class="shop-grid" id="shopGrid"></div>
+    <button class="add-shop-btn" onclick="addShopPrompt()">➕ নতুন দোকান যোগ করুন</button>
+    <button class="go-btn" id="goBtn" onclick="enterShop()" disabled>▶ এই দোকানে ঢুকুন</button>
+    <div class="owner-link">
+      <button onclick="enterDashboard()">📊 Owner Dashboard দেখুন</button>
+    </div>
+  </div>
+</div>
+
+<!-- BARCODE SCANNER MODAL -->
+<div id="scanModal">
+  <div class="sm-box">
+    <h3>📷 Barcode Scan করুন</h3>
+    <div id="scanViewport" style="position:relative;width:100%;border-radius:10px;overflow:hidden;border:3px solid #C8932A;background:#000;min-height:220px">
+      <div id="scanLoading" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#E8B84B;text-align:center;z-index:2">
+        <div style="font-size:1.5rem">⏳</div>
+        <div style="font-size:.8rem;margin-top:4px">Camera চালু হচ্ছে...</div>
+      </div>
+    </div>
+    <div class="scan-line"></div>
+    <div class="sm-result" id="scanResult">✅ <span id="scanVal"></span></div>
+
+    <!-- MANUAL ENTRY -->
+    <div style="margin:10px 0;background:rgba(200,147,42,.12);border-radius:8px;padding:10px;text-align:left">
+      <div style="color:#C8932A;font-size:.72rem;font-weight:700;margin-bottom:5px;text-transform:uppercase;letter-spacing:.08em">✎ Scan না হলে manually লিখুন:</div>
+      <input id="manualBarcode" placeholder="e.g. 1914 20/30"
+        style="width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(200,147,42,.5);border-radius:6px;padding:9px 10px;color:#FAF3E0;font-size:.92rem;outline:none;font-family:inherit"
+        oninput="onManualInput(this.value)"
+        onkeydown="if(event.key==='Enter')confirmScan()"/>
+      <div id="manualResult" style="display:none;color:#6fcf97;font-size:.78rem;margin-top:5px;font-weight:600"></div>
+    </div>
+
+    <div class="sm-btns">
+      <button class="sm-ok" onclick="confirmScan()">✓ Use করুন</button>
+      <button class="sm-cancel" onclick="stopScan()">✕ Cancel</button>
+    </div>
+    <div class="sm-tip">Barcode camera র সামনে ধরুন · অথবা উপরে লিখুন</div>
+  </div>
+</div>
+
+<!-- COSTING CALCULATOR MODAL -->
+<!-- GEETA WEB MODAL -->
+<div id="geetaWebModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:300;overflow-y:auto;padding:14px">
+  <div style="max-width:440px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden">
+    <div style="background:#1A1208;color:#E8B84B;padding:13px 16px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700">🌐 GEETA SUPER — সব Site</span>
+      <button onclick="document.getElementById('geetaWebModal').style.display='none'" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:5px 10px;border-radius:5px;cursor:pointer;font-weight:700;font-family:inherit">← Back</button>
+    </div>
+    <div style="padding:16px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="https://geeta-super-web.netlify.app" target="_blank" style="text-decoration:none">
+          <div style="background:#FFF7E0;border:2px solid #C8932A;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:2rem">🛍️</span>
+            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">Online Shop</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">geeta-super-web.netlify.app</div></div>
+            <span style="margin-left:auto;color:#C8932A;font-size:1.2rem">→</span>
+          </div>
+        </a>
+        <a href="https://geetas.netlify.app" target="_blank" style="text-decoration:none">
+          <div style="background:#E3F2FD;border:2px solid #1976D2;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:2rem">🧾</span>
+            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">Invoice System</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">geetas.netlify.app</div></div>
+            <span style="margin-left:auto;color:#1976D2;font-size:1.2rem">→</span>
+          </div>
+        </a>
+        <a href="https://camerags.netlify.app" target="_blank" style="text-decoration:none">
+          <div style="background:#F3E5F5;border:2px solid #7B1FA2;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:2rem">🗂️</span>
+            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">Sample Collection</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">camerags.netlify.app</div></div>
+            <span style="margin-left:auto;color:#7B1FA2;font-size:1.2rem">→</span>
+          </div>
+        </a>
+        <a href="https://ewaybillgst.gov.in" target="_blank" style="text-decoration:none">
+          <div style="background:#E8F5E9;border:2px solid #27ae60;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:2rem">🚛</span>
+            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">E-Way Bill Portal</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">ewaybillgst.gov.in</div></div>
+            <span style="margin-left:auto;color:#27ae60;font-size:1.2rem">→</span>
+          </div>
+        </a>
+        <a href="https://gst.gov.in" target="_blank" style="text-decoration:none">
+          <div style="background:#FFF3E0;border:2px solid #E65100;border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+            <span style="font-size:2rem">🏛️</span>
+            <div><div style="font-weight:800;color:#1A1208;font-size:.95rem">GST Portal</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">gst.gov.in</div></div>
+            <span style="margin-left:auto;color:#E65100;font-size:1.2rem">→</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN BILL -->
+<div id="billWrap"></div>
+
+<!-- MAIN APP (hidden until login) -->
+<div id="mainApp" style="display:none">
+
+<div class="hdr">
+  <div class="hdr-in">
+    <div class="hdr-left">
+      <div class="logo">M GEETA SUPER<small id="shopNameSmall">Invoice System</small></div>
+      <span class="shop-badge" id="shopBadge" onclick="switchShop()">🏪 দোকান পাল্টান</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <div class="htabs">
+        <button class="htab on" onclick="pg('new')" id="t-new">📝 New Bill</button>
+        <button class="htab" onclick="pg('list')" id="t-list">📋 All Bills</button>
+        <button class="htab" onclick="pg('cust')" id="t-cust">👥 Customers</button>
+        <button class="htab" onclick="pg('stock')" id="t-stock">📦 Stock</button>
+        <button class="htab" onclick="pg('purchase')" id="t-purchase">🛒 Purchase</button>
+        <button class="htab" onclick="pg('costing')" id="t-costing">🧮 Costing</button>
+        <button class="htab" onclick="openGeetaWeb()" id="t-geeta" style="background:rgba(200,147,42,.3)">🌐 Geeta Web</button>
+        <button class="htab" onclick="pg('dash')" id="t-dash">📊 Dashboard</button>
+        <button class="htab" onclick="pg('sett')" id="t-sett">⚙️ Settings</button>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- NEW INVOICE -->
+  <div id="pg-new">
+    <div id="notice" class="notice"></div>
+
+    <div class="copy-info" id="copyInfo">
+      <strong>📄 GST Invoice — 3 Copies on Print/PDF:</strong>
+      Buyer Copy + Seller Copy + Transport Copy
+    </div>
+
+    <div class="card">
+      <div class="ct">📋 Invoice Details</div>
+      <div class="g2">
+        <div class="f">
+          <label>Bill Type</label>
+          <div class="tog">
+            <button class="on" id="bGST" onclick="setT('GST')">GST Invoice</button>
+            <button id="bNoGST" onclick="setT('NoGST')">Without GST</button>
+          </div>
+        </div>
+        <div class="f"><label>Invoice Date</label><input id="bDate" type="date"/></div>
+      </div>
+      <div class="g2">
+        <div class="f">
+          <label>Invoice No. (Auto — editable)</label>
+          <div class="inv-no-wrap">
+            <input id="bNo" placeholder="e.g. GST-2627-0001"/>
+            <button onclick="resetInvNo()">🔄 Auto</button>
+          </div>
+          <span class="inv-note">✎ Manually পাল্টানো যাবে</span>
+        </div>
+        <div class="f"><label>Transport Mode</label><input id="bMode" placeholder="Transport / Courier / Hand"/></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">👤 Customer Details</div>
+      <div class="g2">
+        <div class="f sug-wrap">
+          <label>Customer / Shop Name *</label>
+          <input id="cName" placeholder="e.g. PAL DEPARTMENTAL STORE"
+            oninput="sugCust(this.value)" autocomplete="off"/>
+          <div class="sug-list" id="cSug"></div>
+        </div>
+        <div class="f"><label>Mobile No. *</label>
+          <input id="cPhone" type="tel" placeholder="9876543210" maxlength="10"/>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Full Address</label><input id="cAddr" placeholder="Street, City"/></div>
+        <div class="f"><label>State</label><input id="cState" placeholder="e.g. WEST BENGAL"/></div>
+      </div>
+      <div class="g2" id="gstRow">
+        <div class="f"><label>State Code (Auto)</label><input id="cCode" placeholder="Auto" readonly style="background:#E8F5E9;color:#2E7D32;font-weight:700"/></div>
+        <div class="f"><label>Customer GST IN</label>
+          <input id="cGstin" placeholder="e.g. 19XXXXXX" oninput="autoStateFromGST(this.value)"/>
+          <span style="font-size:.67rem;color:#27ae60;margin-top:2px">✓ State + Code + GST type auto</span>
+        </div>
+      </div>
+      <div id="custNote" style="display:none;border-radius:6px;padding:7px 11px;font-size:.8rem;margin-top:4px"></div>
+    </div>
+
+    <div class="card">
+      <div class="ct">📦 Items
+        <span class="r"><button class="btn bghost btn-sm" onclick="addItem()">+ Add Item</button></span>
+      </div>
+      <div id="itemsBox">
+        <p class="no-items" style="text-align:center;color:#888;padding:18px">No items. Click "+ Add Item".</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="ct">💰 Summary</div>
+      <div class="g2" style="margin-bottom:10px">
+        <div class="f"><label>Bora (Bags)</label><input id="bora" type="number" placeholder="0"/></div>
+        <div class="f"><label>Discount %</label><input id="disc" type="number" placeholder="0" oninput="recalc()"/></div>
+      </div>
+      <div class="g3" id="gstFields" style="margin-bottom:10px">
+        <div class="f"><label>SGST %</label><input id="sg" type="number" value="0" oninput="recalc()"/></div>
+        <div class="f"><label>CGST %</label><input id="cg" type="number" value="0" oninput="recalc()"/></div>
+        <div class="f"><label>IGST %</label><input id="ig" type="number" value="5" oninput="recalc()"/></div>
+      </div>
+      <div class="g2" style="margin-bottom:8px">
+        <div class="f"><label>Packing (₹)</label><input id="pack" type="number" placeholder="0" oninput="recalc()"/></div>
+        <div class="f"><label>Insurance (₹)</label><input id="insur" type="number" placeholder="0" oninput="recalc()"/></div>
+      </div>
+      <div class="f" style="margin-bottom:10px">
+        <label>Old Balance (₹)</label><input id="old" type="number" placeholder="0" oninput="recalc()"/>
+      </div>
+      <div class="totals-box">
+        <div class="trow" style="color:#1565C0;font-weight:700"><span>Total Boxes:</span><span id="tBox">0</span></div>
+        <div class="trow"><span>Total Pcs:</span><span id="tPcs" style="font-weight:700">0</span></div>
+        <div class="trow"><span>Sub Total:</span><span id="tSub">₹0</span></div>
+        <div class="trow" id="rDisc" style="display:none"><span>Discount:</span><span id="tDisc" style="color:#eb5757">₹0</span></div>
+        <div class="trow" id="rGst" style="display:none"><span>Total GST:</span><span id="tGst">₹0</span></div>
+        <div class="trow" id="rPack" style="display:none"><span>Packing+Insurance:</span><span id="tPack">₹0</span></div>
+        <div class="trow" id="rOld" style="display:none"><span>Old Balance:</span><span id="tOld">₹0</span></div>
+        <div class="trow grand"><span>Grand Total:</span><span id="tGrand">₹0</span></div>
+      </div>
+      <div class="g2" style="margin-top:10px">
+        <div class="f"><label>Paid (₹)</label><input id="paid" type="number" placeholder="0" oninput="recalc()"/></div>
+        <div class="f"><label>Balance Due (₹)</label>
+          <input id="due" readonly style="background:#FFE0E0;color:#C62828;font-weight:700;padding:9px 10px;border:1.5px solid #d8d8d8;border-radius:6px;font-family:inherit;font-size:.9rem;width:100%"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="actg">
+      <button class="btn bg s2" onclick="saveInv()">💾 Save Invoice</button>
+      <button class="btn bpdf" id="pdfBtn" onclick="doPDF()">📄 PDF Download</button>
+      <button class="btn bwa" onclick="doWA()">💬 WhatsApp</button>
+      <button class="btn bprint" onclick="doPrint()">🖨️ Print A4</button>
+      <button class="btn s2" style="background:#7B1FA2;color:#fff" onclick="openEWay()">🚛 E-Way Bill</button>
+      <button class="btn bghost" onclick="newInv()">🆕 New Invoice</button>
+    </div>
+  </div>
+
+  <!-- ALL BILLS -->
+  <div id="pg-list" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+    <div class="card">
+      <div class="ct">📋 Bills
+        <span class="r" id="shopFilterWrap">
+          <select id="shopFilter" onchange="renderList()" style="font-size:.78rem;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-family:inherit">
+            <option value="mine">এই দোকান</option>
+            <option value="all">সব দোকান</option>
+          </select>
+        </span>
+      </div>
+      <div class="sw"><input id="srch" placeholder="Invoice no, customer, phone..." oninput="renderList()"/></div>
+      <div class="g2" style="margin-bottom:12px">
+        <div class="f"><label>Filter</label>
+          <select id="fltr" onchange="renderList()">
+            <option value="all">All Bills</option>
+            <option value="GST">GST Bills</option>
+            <option value="NoGST">Without GST</option>
+            <option value="due">Balance Due</option>
+            <option value="paid">Fully Paid</option>
+          </select>
+        </div>
+        <div class="f"><label>Summary</label><input id="lstat" readonly/></div>
+      </div>
+      <div id="listBox"></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div id="pg-cust" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+    <div class="card">
+      <div class="ct">👥 Customers
+        <span class="r"><button class="btn bg btn-sm" onclick="openAddCust()">+ Add</button></span>
+      </div>
+      <div class="sw"><input id="custSrch" placeholder="নাম, ফোন বা GST IN..." oninput="renderCustList()"/></div>
+      <div id="custListBox"></div>
+    </div>
+    <div class="card" id="custFormCard" style="display:none">
+      <div class="ct" id="custFormTitle">➕ New Customer</div>
+      <div class="g2">
+        <div class="f"><label>Name *</label><input id="fc_name" placeholder="Shop Name"/></div>
+        <div class="f"><label>Mobile *</label><input id="fc_phone" type="tel" placeholder="9876543210" maxlength="10"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Address</label><input id="fc_addr" placeholder="Street, City"/></div>
+        <div class="f"><label>State (Auto)</label><input id="fc_state" placeholder="WEST BENGAL"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>State Code (Auto)</label><input id="fc_code" readonly style="background:#E8F5E9;color:#2E7D32;font-weight:700"/></div>
+        <div class="f"><label>GST IN</label><input id="fc_gstin" placeholder="19XXXXXX" oninput="autoStateForCust(this.value)"/></div>
+      </div>
+      <input type="hidden" id="fc_id"/>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn bg" style="flex:1" onclick="saveCust()">💾 Save</button>
+        <button class="btn bghost" onclick="closeCustForm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURCHASE TAB -->
+  <div id="pg-purchase" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+
+    <div class="card">
+      <div class="ct">🛒 নতুন Purchase / খরচ যোগ করুন</div>
+      <div id="catGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:14px"></div>
+      <div class="g2">
+        <div class="f"><label>তারিখ</label><input id="pDate" type="date"/></div>
+        <div class="f"><label>Category (selected)</label><input id="pCat" readonly style="background:#FFF7E0;color:#C8932A;font-weight:700"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>বিবরণ / Details</label><input id="pDesc" placeholder="e.g. কাপড়ের নাম, দোকানের নাম"/></div>
+        <div class="f"><label>Supplier / দোকান</label><input id="pSupplier" placeholder="e.g. রহিম ক্লথ হাউস"/></div>
+      </div>
+      <div class="g3">
+        <div class="f"><label>Qty</label><input id="pQty" type="number" placeholder="0" oninput="calcPurchase()"/></div>
+        <div class="f"><label>Rate (₹)</label><input id="pRate" type="number" placeholder="0" oninput="calcPurchase()"/></div>
+        <div class="f"><label>মোট (₹)</label><input id="pTotal" type="number" placeholder="0" oninput="calcPurchase()" style="background:#FFF7E0;font-weight:700"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Paid (₹)</label><input id="pPaid" type="number" placeholder="0" oninput="calcPurchase()"/></div>
+        <div class="f"><label>বাকি (₹)</label><input id="pDue" readonly style="background:#FFE0E0;color:#C62828;font-weight:700;padding:9px 10px;border:1.5px solid #d8d8d8;border-radius:6px;font-family:inherit;font-size:.9rem;width:100%"/></div>
+      </div>
+      <div class="f" style="margin-top:6px"><label>Note</label>
+        <textarea id="pNote" placeholder="অতিরিক্ত তথ্য..." style="min-height:50px;padding:9px 10px;border:1.5px solid #d8d8d8;border-radius:6px;font-family:inherit;font-size:.9rem;outline:none;width:100%;resize:vertical;background:#fafafa"></textarea>
+      </div>
+      <div id="pMsg" class="notice" style="margin-top:8px"></div>
+      <button class="btn bg btn-block" style="margin-top:10px" onclick="savePurchase()">💾 Save করুন</button>
+    </div>
+
+    <div class="card">
+      <div class="ct">📋 Purchase History
+        <span class="r">
+          <select id="pFilter" onchange="renderPurchase()" style="font-size:.78rem;padding:4px 8px;border:1px solid #ddd;border-radius:6px;font-family:inherit">
+            <option value="all">সব</option>
+            <option value="কাপড় কেনা">🧵 কাপড় কেনা</option>
+            <option value="দর্জি খরচ">✂️ দর্জি খরচ</option>
+            <option value="কাটিং খরচ">✂️ কাটিং খরচ</option>
+            <option value="আয়রন খরচ">🔥 আয়রন খরচ</option>
+            <option value="বোতাম/শ্রমিক">🪡 বোতাম/শ্রমিক</option>
+            <option value="ইলেকট্রিক বিল">⚡ ইলেকট্রিক বিল</option>
+            <option value="এমব্রয়ডারি">🎨 এমব্রয়ডারি</option>
+            <option value="বাক্স/প্যাকেজিং">📦 বাক্স/প্যাকেজিং</option>
+            <option value="ট্রান্সপোর্ট">🚚 ট্রান্সপোর্ট</option>
+            <option value="প্রিন্টিং/লেবেল">🖨️ প্রিন্টিং/লেবেল</option>
+            <option value="বেতন/শ্রমিক">👷 বেতন/শ্রমিক</option>
+            <option value="অন্যান্য">💡 অন্যান্য</option>
+          </select>
+        </span>
+      </div>
+      <div id="purchaseSummary"></div>
+      <div id="purchaseList"></div>
+    </div>
+  </div>
+
+  <!-- STOCK -->
+  <div id="pg-stock" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+    <div class="card">
+      <div class="ct">📦 Stock — Live from Shop</div>
+      <div style="background:#E3F2FD;border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:.82rem;color:#1565C0">
+        💡 Stock geeta-super-web থেকে আসছে। Invoice করলে auto কমবে।
+      </div>
+      <div class="sw"><input id="stockSrch" placeholder="Design no বা size..." oninput="renderStock()"/></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn bghost btn-sm" onclick="setStockFilter('all')" id="sf-all" style="background:#1A1208;color:#E8B84B">All</button>
+        <button class="btn bghost btn-sm" onclick="setStockFilter('low')" id="sf-low">⚠️ Low</button>
+        <button class="btn bghost btn-sm" onclick="setStockFilter('out')" id="sf-out">❌ Out</button>
+      </div>
+      <div id="stockBox"></div>
+    </div>
+  </div>
+
+  <!-- COSTING TAB -->
+  <div id="pg-costing" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+
+    <!-- COSTING SYSTEM EMBEDDED -->
+    <div style="font-family:'Segoe UI','Noto Sans Bengali',sans-serif;color:#e8f0e8">
+
+      <!-- Design No + Save -->
+      <div class="card" style="background:rgba(15,25,35,.95);border:1px solid #1e3a1e">
+        <div style="font-size:11px;color:#6b9e7e;margin-bottom:6px;letter-spacing:1px;font-weight:700;">ডিজাইন নম্বর</div>
+        <input id="cDesignNo" placeholder="যেমন: D-101" style="width:100%;padding:12px 14px;font-size:18px;font-weight:800;letter-spacing:1px;text-align:center;background:rgba(46,204,113,0.1);border:1.5px solid #2ecc71;border-radius:8px;color:#2ecc71;font-family:inherit;outline:none" oninput="cCalc()"/>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button onclick="cSaveDesign()" style="flex:1;background:linear-gradient(90deg,#27ae60,#2ecc71);border:none;border-radius:8px;color:#0f1923;font-weight:800;font-size:.95rem;padding:12px;cursor:pointer;font-family:inherit">💾 সেভ করুন</button>
+          <button onclick="cToggleSaved()" style="flex:1;background:rgba(155,89,182,0.15);border:1px solid #6c3a82;border-radius:8px;color:#c39bd3;font-weight:700;font-size:.9rem;padding:12px;cursor:pointer;font-family:inherit">📋 সেভ করা (<span id="cSavedCount">0</span>)</button>
+        </div>
+        <div id="cSaveStatus" style="display:none;text-align:center;margin-top:10px;padding:8px;border-radius:6px;font-size:14px;font-weight:700"></div>
+        <div id="cSavedList" style="display:none;border-top:1px solid #1e3a1e;padding-top:12px;margin-top:12px"></div>
+      </div>
+
+      <!-- Fabric -->
+      <div class="card" style="background:rgba(15,25,35,.95);border:1px solid #1e3a1e">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8ab890;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ecc71"></span>কাপড়ের হিসাব
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">কাপড়ের দাম</div>
+            <input id="cFabricPrice" type="number" value="100" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+            <div style="font-size:10px;color:#3a5a3a;margin-top:2px">টাকা/মিটার</div></div>
+          <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">কাপড় লাগে</div>
+            <input id="cFabricMeters" type="number" value="6" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+            <div style="font-size:10px;color:#3a5a3a;margin-top:2px">মিটার</div></div>
+          <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">পিস হয়</div>
+            <input id="cPiecesPerRoll" type="number" value="12" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+            <div style="font-size:10px;color:#3a5a3a;margin-top:2px">পিস</div></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 12px;background:rgba(46,204,113,0.06);border-radius:8px;border:1px solid #1e3a1e">
+          <span style="color:#6b9e7e;font-size:13px">কাপড় খরচ প্রতি পিস</span>
+          <span style="color:#2ecc71;font-weight:700;font-size:16px">৳ <span id="cFabricCost">0.00</span></span>
+        </div>
+      </div>
+
+      <!-- Other Costs -->
+      <div class="card" style="background:rgba(15,25,35,.95);border:1px solid #1e3a1e">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8ab890;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f39c12"></span>অন্যান্য খরচ (প্রতি পিস)
+        </div>
+
+        <div style="font-size:13px;font-weight:700;color:#a8e6cf;background:rgba(46,204,113,0.08);border-radius:6px;padding:6px 10px;margin-bottom:6px">👕 সাধারণ খরচ</div>
+        <div id="cGeneralItems"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px 10px;background:rgba(243,156,18,0.06);border-radius:6px;font-size:13px;color:#8ab890;font-weight:600">
+          <span>সাধারণ খরচের যোগফল</span><span style="color:#f39c12;font-weight:700">৳ <span id="cGeneralTotal">0.00</span></span>
+        </div>
+
+        <!-- Pant fabric -->
+        <div style="font-size:13px;font-weight:700;color:#a8e6cf;background:rgba(46,204,113,0.08);border-radius:6px;padding:6px 10px;margin:18px 0 6px">👖 প্যান্টের খরচ</div>
+        <div style="background:rgba(52,152,219,0.06);border-radius:8px;padding:12px;margin-bottom:8px;border:1px solid #1e3a4a">
+          <div style="font-size:12px;color:#7fb4d6;margin-bottom:8px;font-weight:700">প্যান্ট কাপড়ের হিসাব</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">কাপড়ের দাম</div>
+              <input id="cPantFabricPrice" type="number" value="0" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+              <div style="font-size:10px;color:#3a5a3a;margin-top:2px">টাকা/মিটার</div></div>
+            <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">কাপড় লাগে</div>
+              <input id="cPantFabricMeters" type="number" value="0" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+              <div style="font-size:10px;color:#3a5a3a;margin-top:2px">মিটার</div></div>
+            <div><div style="font-size:11px;color:#6b9e7e;margin-bottom:4px">পিস হয়</div>
+              <input id="cPantPieces" type="number" value="1" oninput="cCalc()" style="width:100%;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+              <div style="font-size:10px;color:#3a5a3a;margin-top:2px">পিস</div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;padding:8px 10px;background:rgba(52,152,219,0.08);border-radius:6px">
+            <span style="color:#7fb4d6;font-size:13px">প্যান্ট কাপড় খরচ প্রতি পিস</span>
+            <span style="color:#3498db;font-weight:700;font-size:15px">৳ <span id="cPantFabricCost">0.00</span></span>
+          </div>
+        </div>
+        <div id="cPantItems"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding:8px 10px;background:rgba(243,156,18,0.06);border-radius:6px;font-size:13px;color:#8ab890;font-weight:600">
+          <span>প্যান্টের খরচের যোগফল</span><span style="color:#3498db;font-weight:700">৳ <span id="cPantTotal">0.00</span></span>
+        </div>
+
+        <!-- Add new item -->
+        <div style="margin-top:14px;border-top:1px solid #1e3a1e;padding-top:14px">
+          <div style="font-size:12px;color:#6b9e7e;margin-bottom:8px">+ নতুন খরচ যোগ করুন</div>
+          <div style="display:flex;gap:8px">
+            <input id="cNewItemName" placeholder="খরচের নাম" style="flex:2;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:8px 10px;font-size:.9rem;font-family:inherit;outline:none"/>
+            <input id="cNewItemValue" type="number" placeholder="৳" style="flex:1;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:8px 10px;font-size:.9rem;font-family:inherit;outline:none"/>
+            <button onclick="cAddItem()" style="background:linear-gradient(90deg,#27ae60,#2ecc71);border:none;border-radius:6px;color:#0f1923;font-weight:700;font-size:13px;padding:8px 14px;cursor:pointer;font-family:inherit;white-space:nowrap">যোগ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profit -->
+      <div class="card" style="background:rgba(15,25,35,.95);border:1px solid #1e3a1e">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8ab890;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9b59b6"></span>মুনাফা (Profit)
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <input id="cProfitRange" type="range" min="0" max="100" value="20" oninput="cSyncProfit(this.value)" style="flex:1;accent-color:#9b59b6;height:6px"/>
+          <div style="display:flex;align-items:center;gap:4px">
+            <input id="cProfit" type="number" value="20" min="0" max="100" oninput="cSyncProfitNum(this.value)" style="width:60px;text-align:center;background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;font-family:inherit;outline:none"/>
+            <span style="color:#6b9e7e;font-size:13px">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div id="cSummaryCard" class="card" style="background:linear-gradient(135deg,#1a3a1a,#0d2a0d);border:1px solid #2ecc71">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#8ab890;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#2ecc71"></span>
+          সারসংক্ষেপ — প্রতি পিস
+          <span id="cSummaryDesign" style="margin-left:auto;background:rgba(46,204,113,0.15);border:1px solid #2ecc71;border-radius:5px;padding:2px 10px;color:#2ecc71;font-size:12px;display:none"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#8ab890">কাপড় খরচ</span><span style="font-size:14px;color:#a8e6cf">৳ <span id="cSFabric">0.00</span></span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#8ab890">সাধারণ খরচ</span><span style="font-size:14px;color:#a8e6cf">৳ <span id="cSGeneral">0.00</span></span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#8ab890">প্যান্টের খরচ</span><span style="font-size:14px;color:#a8e6cf">৳ <span id="cSPant">0.00</span></span></div>
+        <div style="border-top:1px dashed #2d5a2d;margin:10px 0"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#8ab890;font-weight:700">মোট উৎপাদন খরচ</span><span style="font-size:14px;color:#f1c40f;font-weight:700">৳ <span id="cSTotal">0.00</span></span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:#8ab890">মুনাফা (<span id="cSProfitPct">20</span>%)</span><span style="font-size:14px;color:#9b59b6">৳ <span id="cSProfit">0.00</span></span></div>
+        <div style="border-top:1px solid #2ecc71;margin:10px 0"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:16px;font-weight:700;color:#c8e6c9">বিক্রয় মূল্য</span>
+          <span style="font-size:28px;font-weight:900;color:#2ecc71">৳ <span id="cSSelling">0.00</span></span>
+        </div>
+        <div style="margin-top:16px;padding:12px;background:rgba(46,204,113,0.08);border-radius:8px;border:1px solid #1e4a1e">
+          <div style="font-size:12px;color:#6b9e7e;margin-bottom:6px"><span id="cBatchN">12</span> পিসের মোট হিসাব</div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#a8e6cf;font-size:13px">মোট খরচ</span><span style="color:#f1c40f;font-weight:700">৳ <span id="cBatchCost">0.00</span></span></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:#a8e6cf;font-size:13px">মোট বিক্রয়</span><span style="color:#2ecc71;font-weight:700">৳ <span id="cBatchSell">0.00</span></span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#a8e6cf;font-size:13px">মোট লাভ</span><span style="color:#9b59b6;font-weight:700">৳ <span id="cBatchProfit">0.00</span></span></div>
+        </div>
+      </div>
+
+    </div><!-- end costing system -->
+  </div><!-- end pg-costing -->
+
+  <!-- OWNER DASHBOARD -->
+  <div id="pg-dash" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+    <div class="card">
+      <div class="ct">📊 Owner Dashboard — সব দোকান</div>
+      <div id="dashBox"><p style="text-align:center;padding:20px;color:#888">Loading...</p></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="pg-sett" style="display:none">
+    <button onclick="pg('new')" style="display:flex;align-items:center;gap:6px;background:#1A1208;color:#E8B84B;border:none;padding:10px 16px;border-radius:8px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit;margin-bottom:12px">← New Bill এ ফিরুন</button>
+    <div class="card">
+      <div class="ct">🏢 Company</div>
+      <div class="g2">
+        <div class="f"><label>Main Company Name</label><input id="sCo" value="M GEETA SUPER"/></div>
+        <div class="f"><label>Sub Brand (Without GST)</label><input id="sCo2" value="TESLA INDIA"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Owner</label><input id="sOwn" value="mr jyoti"/></div>
+        <div class="f"><label>Mobile</label><input id="sMob" value="9830127586"/></div>
+      </div>
+      <div class="f"><label>GST IN</label><input id="sGst" value="19AKKPK2513L1ZY"/></div>
+      <div class="f"><label>Address</label>
+        <textarea id="sAddr" rows="3">Y-266/4 MULLICK PARA LANE,KOLKATA-700018
+KARBALA,GHOSH CENTRE-U-111
+HOWRAH HAT(GANESH),424</textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">🏦 Bank</div>
+      <div class="g2">
+        <div class="f"><label>Bank Name</label><input id="sBN" value="SBI (STATE BANK OF INDIA)"/></div>
+        <div class="f"><label>IFSC</label><input id="sBI" value="SBIN0001303"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Account No.</label><input id="sBA" value="32608808921"/></div>
+        <div class="f"><label>UPI ID</label><input id="sBU" placeholder="name@bank"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">🔢 Invoice Number</div>
+      <div class="g2">
+        <div class="f"><label>GST Prefix</label><input id="sGSTpre" value="GST"/></div>
+        <div class="f"><label>Non-GST Prefix</label><input id="sINVpre" value="INV"/></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>Financial Year</label><input id="sYear" value="2627"/></div>
+        <div class="f"><label>Start Number</label><input id="sStart" value="1" type="number" min="1"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">🔐 Change Password</div>
+      <div class="g2">
+        <div class="f"><label>New Password</label><input id="sPass" type="password" placeholder="নতুন password"/></div>
+        <div class="f"><label>Confirm Password</label><input id="sPass2" type="password" placeholder="আবার দিন"/></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">🏪 Shop Management</div>
+      <div id="shopMgmtBox"></div>
+      <button class="btn bghost btn-sm" style="margin-top:8px" onclick="addShopPrompt()">➕ নতুন দোকান যোগ করুন</button>
+    </div>
+    <button class="btn bprim btn-block" onclick="saveSett()">💾 Save Settings</button>
+  </div>
+
+</div><!-- wrap -->
+</div><!-- mainApp -->
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, doc, addDoc, setDoc, deleteDoc, updateDoc, onSnapshot, query, orderBy, where, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const cfg={apiKey:"AIzaSyD7TPpEu_fQJQPN91EDyAxpxKT9fzqBFqE",authDomain:"geeta-super-f8d47.firebaseapp.com",projectId:"geeta-super-f8d47",storageBucket:"geeta-super-f8d47.firebasestorage.app",messagingSenderId:"167099783550",appId:"1:167099783550:web:4cb72719929ef792b9fb2f"};
+const db=getFirestore(initializeApp(cfg));
+window.FB={db,collection,doc,addDoc,setDoc,deleteDoc,updateDoc,onSnapshot,query,orderBy,where,serverTimestamp,getDoc};
+window.dispatchEvent(new Event("fbOK"));
+</script>
+
+<script>
+// ===== STATE =====
+let bType="GST",bills=[],allBills=[],custs={},savedContacts=[],shopProducts=[],curId=null;
+let itemCounter=0,itemIds=[];
+let currentShop=null; // {id, name, location}
+let shops=[
+  {id:"karbala",name:"Karbala",location:"Ghosh Centre-U-111, Kolkata"},
+  {id:"howrah",name:"Howrah Hat",location:"Ganesh, 424"},
+  {id:"mullick",name:"Mullick Para",location:"Y-266/4, Kolkata-700018"}
+];
+let stockFilter="all";
+let S={
+  co:"M GEETA SUPER",co2:"TESLA INDIA",own:"mr jyoti",mob:"9830127586",
+  gstin:"19AKKPK2513L1ZY",
+  addr:"Y-266/4 MULLICK PARA LANE,KOLKATA-700018\nKARBALA,GHOSH CENTRE-U-111\nHOWRAH HAT(GANESH),424",
+  bn:"SBI (STATE BANK OF INDIA)",bi:"SBIN0001303",ba:"32608808921",bu:"",
+  gstPre:"GST",invPre:"INV",year:"2627",start:1,
+  password:"geeta2027",tag2:"A Unit of M GEETA SUPER"
+};
+
+// ===== LOGIN =====
+function doLogin(){
+  // Direct login - no password needed temporarily
+  document.getElementById("loginScreen").style.display="none";
+  showShopScreen();
+}
+
+function doLogout(){
+  if(!confirm("Logout করবেন?"))return;
+  currentShop=null;
+  document.getElementById("mainApp").style.display="none";
+  document.getElementById("loginScreen").style.display="flex";
+  document.getElementById("pwInput").value="";
+}
+
+// ===== SHOP SELECT =====
+function showShopScreen(){
+  renderShopGrid();
+  document.getElementById("shopScreen").style.display="flex";
+}
+
+function renderShopGrid(){
+  const grid=document.getElementById("shopGrid");
+  const icons=["🏪","🏬","🏢","🛒","🏭","🏗️","🏨","🏦"];
+  grid.innerHTML=shops.map((s,i)=>`
+    <div class="shop-card ${currentShop?.id===s.id?'sel':''}" onclick="selShop('${s.id}')" id="sc-${s.id}">
+      <div class="sc-icon">${icons[i%icons.length]}</div>
+      <div class="sc-name">${s.name}</div>
+      <div class="sc-loc">${s.location||''}</div>
+      <div style="margin-top:6px" onclick="event.stopPropagation()">
+        <button style="background:rgba(0,0,0,.12);border:none;border-radius:5px;padding:3px 8px;font-size:.68rem;cursor:pointer;font-family:inherit;color:inherit" onclick="editShop('${s.id}')">✏️ Edit</button>
+        <button style="background:rgba(200,0,0,.15);border:none;border-radius:5px;padding:3px 8px;font-size:.68rem;cursor:pointer;font-family:inherit;color:#c00" onclick="removeShop('${s.id}')">🗑️</button>
+      </div>
+    </div>`).join("");
+}
+
+function selShop(id){
+  currentShop=shops.find(s=>s.id===id);
+  document.querySelectorAll(".shop-card").forEach(c=>c.classList.remove("sel"));
+  document.getElementById("sc-"+id)?.classList.add("sel");
+  document.getElementById("goBtn").disabled=false;
+}
+
+function enterShop(){
+  if(!currentShop)return;
+  document.getElementById("shopScreen").style.display="none";
+  document.getElementById("mainApp").style.display="block";
+  document.getElementById("shopBadge").textContent="🏪 "+currentShop.name;
+  document.getElementById("shopNameSmall").textContent=currentShop.name+" — Invoice System";
+  renderShopMgmt();
+  resetInvNo();
+  pg("new");
+  notice("✅ "+currentShop.name+" এ স্বাগতম!","ok");
+}
+
+function enterDashboard(){
+  document.getElementById("shopScreen").style.display="none";
+  document.getElementById("mainApp").style.display="block";
+  document.getElementById("shopBadge").textContent="📊 Dashboard";
+  document.getElementById("shopNameSmall").textContent="Owner Dashboard";
+  pg("dash");
+}
+
+function switchShop(){
+  document.getElementById("mainApp").style.display="none";
+  showShopScreen();
+}
+
+function addShopPrompt(){
+  const name=prompt("নতুন দোকানের নাম দিন:");
+  if(!name||!name.trim())return;
+  const loc=prompt("ঠিকানা (optional):")||"";
+  const id="shop_"+Date.now();
+  shops.push({id,name:name.trim(),location:loc.trim()});
+  saveShops();
+  renderShopGrid();
+  renderShopMgmt();
+}
+
+function saveShops(){
+  window.FB?.setDoc(window.FB.doc(window.FB.db,"billing_settings","shops"),{shops});
+}
+
+function renderShopMgmt(){
+  const box=document.getElementById("shopMgmtBox");
+  if(!box)return;
+  box.innerHTML=shops.map(s=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#f9f9f9;border-radius:7px;margin-bottom:6px">
+      <div>
+        <div style="font-weight:700;font-size:.88rem">${s.name}</div>
+        <div style="font-size:.75rem;color:#888">${s.location||'—'}</div>
+      </div>
+      <div style="display:flex;gap:5px">
+        <button class="btn binfo btn-sm" onclick="editShop('${s.id}')">✏️</button>
+        <button class="btn bred btn-sm" onclick="removeShop('${s.id}')">🗑️</button>
+      </div>
+    </div>`).join("");
+}
+
+function editShop(id){
+  const s=shops.find(x=>x.id===id);if(!s)return;
+  const name=prompt("দোকানের নাম:",s.name);if(!name)return;
+  const loc=prompt("ঠিকানা:",s.location||"");
+  s.name=name.trim();s.location=(loc||"").trim();
+  saveShops();renderShopGrid();renderShopMgmt();
+}
+
+function removeShop(id){
+  if(!confirm("এই দোকান মুছবেন?"))return;
+  shops=shops.filter(s=>s.id!==id);
+  saveShops();renderShopGrid();renderShopMgmt();
+}
+
+// ===== TABS =====
+function pg(t){
+  ["new","list","sett","cust","stock","dash","purchase","costing"].forEach(x=>{
+    document.getElementById("pg-"+x).style.display=x===t?"block":"none";
+    document.getElementById("t-"+x)?.classList.toggle("on",x===t);
+  });
+  if(t==="list")renderList();
+  if(t==="cust"){buildC();renderCustList();}
+  if(t==="stock")renderStock();
+  if(t==="dash")renderDash();
+  if(t==="purchase"){initCatGrid();renderPurchase();}
+  if(t==="costing"){cRenderItems();cCalc();}
+}
+
+// ===== BILL TYPE =====
+function setT(t){
+  bType=t;
+  document.getElementById("bGST").classList.toggle("on",t==="GST");
+  document.getElementById("bNoGST").classList.toggle("on",t==="NoGST");
+  document.getElementById("gstFields").style.display=t==="GST"?"grid":"none";
+  document.getElementById("gstRow").style.display=t==="GST"?"grid":"none";
+  const info=document.getElementById("copyInfo");
+  if(t==="GST"){
+    info.innerHTML=`<strong>📄 GST Invoice — M GEETA SUPER — 3 Copies:</strong> Buyer + Seller + Transport`;
+    document.getElementById("ig").value="5";
+  }else{
+    info.innerHTML=`<strong>📄 Without GST — M GEETA SUPER · TESLA INDIA — 1 Copy:</strong> Seller Copy`;
+    ["sg","cg","ig"].forEach(id=>document.getElementById(id).value="0");
+  }
+  resetInvNo();recalc();
+}
+
+// ===== INVOICE NO =====
+function genInvNo(){
+  const pre=bType==="GST"?(S.gstPre||"GST"):(S.invPre||"INV");
+  const yr=S.year||"2627";
+  const shopBills=bills.filter(b=>b.bType===bType&&b.shopId===currentShop?.id).length;
+  const n=shopBills+(parseInt(S.start)||1);
+  return`${pre}-${yr}-${String(n).padStart(4,"0")}`;
+}
+function resetInvNo(force){if(!force&&curId)return;document.getElementById("bNo").value=genInvNo();}
+
+// ===== GST STATE CODES =====
+const GST_STATES={
+  "01":"JAMMU & KASHMIR","02":"HIMACHAL PRADESH","03":"PUNJAB","04":"CHANDIGARH",
+  "05":"UTTARAKHAND","06":"HARYANA","07":"DELHI","08":"RAJASTHAN","09":"UTTAR PRADESH",
+  "10":"BIHAR","11":"SIKKIM","12":"ARUNACHAL PRADESH","13":"NAGALAND","14":"MANIPUR",
+  "15":"MIZORAM","16":"TRIPURA","17":"MEGHALAYA","18":"ASSAM","19":"WEST BENGAL",
+  "20":"JHARKHAND","21":"ODISHA","22":"CHHATTISGARH","23":"MADHYA PRADESH",
+  "24":"GUJARAT","25":"DAMAN & DIU","26":"DADRA & NAGAR HAVELI","27":"MAHARASHTRA",
+  "28":"ANDHRA PRADESH","29":"KARNATAKA","30":"GOA","31":"LAKSHADWEEP",
+  "32":"KERALA","33":"TAMIL NADU","34":"PUDUCHERRY","35":"ANDAMAN & NICOBAR",
+  "36":"TELANGANA","37":"ANDHRA PRADESH (NEW)","38":"LADAKH","97":"OTHER TERRITORY"
+};
+
+function autoStateFromGST(gstin){
+  const code=(gstin||"").trim().substring(0,2);
+  const state=GST_STATES[code];
+  if(state&&/^\d{2}$/.test(code)){
+    document.getElementById("cCode").value=code;
+    document.getElementById("cState").value=state;
+    const myCode=(S.gstin||"19AKKPK2513L1ZY").substring(0,2);
+    const note=document.getElementById("custNote");
+    note.style.display="block";
+    if(code===myCode){
+      document.getElementById("sg").value="2.5";
+      document.getElementById("cg").value="2.5";
+      document.getElementById("ig").value="0";
+      note.style.background="#E8F5E9";note.style.color="#2E7D32";
+      note.innerHTML=`✅ <b>${state}</b> — Same State → <b>SGST 2.5% + CGST 2.5%</b>`;
+    }else{
+      document.getElementById("sg").value="0";
+      document.getElementById("cg").value="0";
+      document.getElementById("ig").value="5";
+      note.style.background="#FFF3E0";note.style.color="#E65100";
+      note.innerHTML=`✅ <b>${state}</b> — Different State → <b>IGST 5%</b>`;
+    }
+    recalc();
+    setTimeout(()=>note.style.display="none",4000);
+  }else{
+    document.getElementById("cCode").value="";
+  }
+}
+
+function autoStateForCust(gstin){
+  const code=(gstin||"").trim().substring(0,2);
+  const state=GST_STATES[code];
+  if(state&&/^\d{2}$/.test(code)){
+    document.getElementById("fc_code").value=code;
+    document.getElementById("fc_state").value=state;
+  }
+}
+
+// ===== ITEMS =====
+function escH(s){return(s||"").toString().replace(/"/g,"&quot;").replace(/</g,"&lt;");}
+
+function addItem(data){
+  const id=++itemCounter;
+  itemIds.push(id);
+  const box=document.getElementById("itemsBox");
+  box.querySelector(".no-items")?.remove();
+  const qty=data?.qty||"",desc=data?.desc||"",design=data?.design||"",
+        size=data?.size||"",hsn=data?.hsn||"",rate=data?.rate||"";
+  const amt=(parseFloat(qty)||0)*(parseFloat(rate)||0);
+  const div=document.createElement("div");
+  div.className="item-card";div.id="item-"+id;
+  div.innerHTML=`
+    <div class="item-head">
+      <span class="item-num">ITEM #${itemIds.length}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="item-amt-show" id="amt-${id}">₹${amt?amt.toLocaleString("en-IN",{maximumFractionDigits:2}):"0"}</span>
+        <button class="btn bred btn-sm" onclick="rmItem(${id})">✕</button>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:8px">
+      <div class="f"><label>Description</label><input id="d-desc-${id}" value="${escH(desc)}" placeholder="e.g. BABA SUIT"/></div>
+      <div class="f"><label>Design No. *</label>
+        <div style="display:flex;gap:4px">
+          <input id="d-design-${id}" value="${escH(design)}" placeholder="e.g. 1901" oninput="checkStock(${id})" style="flex:1"/>
+          <button onclick="startScan(${id})" style="background:#1A1208;color:#E8B84B;border:none;padding:0 10px;border-radius:6px;cursor:pointer;font-size:1rem;flex-shrink:0" title="Barcode Scan">📷</button>
+        </div>
+      </div>
+    </div>
+    <div class="g2" style="margin-bottom:8px">
+      <div class="f"><label>Size *</label><input id="d-size-${id}" value="${escH(size)}" placeholder="e.g. 16/18" oninput="checkStock(${id})"/></div>
+      <div class="f"><label>HSN Code</label><input id="d-hsn-${id}" value="${escH(hsn)}" placeholder="e.g. 620342"/></div>
+    </div>
+    <div class="g2">
+      <div class="f"><label>Quantity (Pcs) *</label><input id="d-qty-${id}" type="number" value="${qty}" placeholder="e.g. 48" oninput="updAmt(${id})"/></div>
+      <div class="f"><label>Rate per Pc (₹) *</label><input id="d-rate-${id}" type="number" value="${rate}" placeholder="e.g. 200" oninput="updAmt(${id})"/></div>
+    </div>
+    <div id="stock-${id}" style="display:none;border-radius:5px;padding:5px 9px;font-size:.78rem;margin-top:6px"></div>
+    <div id="hint-${id}" style="background:#E3F2FD;border-radius:5px;padding:5px 9px;font-size:.75rem;color:#1565C0;margin-top:6px">
+      ${qty&&rate?`${qty} × ₹${rate} = ₹${amt.toLocaleString("en-IN",{maximumFractionDigits:2})}`:"Enter qty and rate"}
+    </div>`;
+  box.appendChild(div);
+  if(!qty)setTimeout(()=>document.getElementById("d-qty-"+id)?.focus(),50);
+  if(design&&size)setTimeout(()=>checkStock(id),300);
+}
+
+function updAmt(id){
+  const qty=parseFloat(document.getElementById("d-qty-"+id)?.value)||0;
+  const rate=parseFloat(document.getElementById("d-rate-"+id)?.value)||0;
+  const amt=qty*rate;
+  const f=n=>n.toLocaleString("en-IN",{maximumFractionDigits:2});
+  const ae=document.getElementById("amt-"+id);
+  const he=document.getElementById("hint-"+id);
+  if(ae)ae.textContent="₹"+f(amt);
+  if(he)he.textContent=qty&&rate?`${qty} × ₹${rate} = ₹${f(amt)}`:"Enter qty and rate";
+  recalc();
+}
+
+function rmItem(id){
+  document.getElementById("item-"+id)?.remove();
+  itemIds=itemIds.filter(x=>x!==id);
+  itemIds.forEach((iid,i)=>{const n=document.querySelector(`#item-${iid} .item-num`);if(n)n.textContent=`ITEM #${i+1}`;});
+  if(!itemIds.length)document.getElementById("itemsBox").innerHTML=`<p class="no-items" style="text-align:center;color:#888;padding:18px">No items. Click "+ Add Item".</p>`;
+  recalc();
+}
+
+function readItems(){
+  return itemIds.map(id=>({
+    qty:parseFloat(document.getElementById("d-qty-"+id)?.value)||0,
+    rate:parseFloat(document.getElementById("d-rate-"+id)?.value)||0,
+    desc:(document.getElementById("d-desc-"+id)?.value||"").trim(),
+    design:(document.getElementById("d-design-"+id)?.value||"").trim(),
+    size:(document.getElementById("d-size-"+id)?.value||"").trim(),
+    hsn:(document.getElementById("d-hsn-"+id)?.value||"").trim(),
+    amount:(parseFloat(document.getElementById("d-qty-"+id)?.value)||0)*(parseFloat(document.getElementById("d-rate-"+id)?.value)||0)
+  }));
+}
+
+// ===== STOCK CHECK =====
+function checkStock(id){
+  const design=(document.getElementById("d-design-"+id)?.value||"").trim();
+  const size=(document.getElementById("d-size-"+id)?.value||"").trim();
+  const el=document.getElementById("stock-"+id);
+  if(!el||!design||!size){if(el)el.style.display="none";return;}
+  const match=shopProducts.find(p=>(p.design||"").toLowerCase().trim()===design.toLowerCase()&&(p.size||"").toLowerCase().trim()===size.toLowerCase());
+  if(match){
+    const s=match.stock||0;
+    // AUTO-FILL Rate and Description
+    const rateEl=document.getElementById("d-rate-"+id);
+    const descEl=document.getElementById("d-desc-"+id);
+    const hsnEl=document.getElementById("d-hsn-"+id);
+    if(rateEl&&!rateEl.value&&match.price){
+      rateEl.value=match.price;
+      updAmt(id);
+    }
+    if(descEl&&!descEl.value&&match.description){
+      descEl.value=match.description;
+    }
+    if(hsnEl&&!hsnEl.value&&match.hsn){
+      hsnEl.value=match.hsn;
+    }
+    el.style.display="block";
+    if(s<=0){el.style.background="#FFE0E0";el.style.color="#C62828";el.innerHTML=`❌ OUT OF STOCK · ₹${match.price||'—'}`;}
+    else if(s<=12){el.style.background="#FFF3E0";el.style.color="#E65100";el.innerHTML=`⚠️ LOW: <b>${s} pcs</b> · Rate: ₹${match.price||'—'} ✓`;}
+    else{el.style.background="#E8F5E9";el.style.color="#2E7D32";el.innerHTML=`✅ Stock: <b>${s} pcs</b> · Rate: ₹${match.price||'—'} ✓`;}
+  }else{
+    el.style.display="block";el.style.background="#f0f0f0";el.style.color="#666";
+    el.innerHTML=`ℹ️ Design: ${design} · Size: ${size} — stock এ নেই`;
+  }
+}
+
+async function deductStock(items){
+  for(const it of items){
+    if(!it.qty||it.qty<=0)continue;
+    const match=shopProducts.find(p=>(p.design||"").toLowerCase().trim()===(it.design||"").toLowerCase()&&(p.size||"").toLowerCase().trim()===(it.size||"").toLowerCase());
+    if(match?.id){
+      const newStock=Math.max(0,(match.stock||0)-it.qty);
+      try{await window.FB.updateDoc(window.FB.doc(window.FB.db,"products",match.id),{stock:newStock});}
+      catch(e){console.error("Stock error:",e);}
+    }
+  }
+}
+
+// ===== RECALC =====
+function recalc(){
+  const its=readItems();
+  let sub=0,pcs=0;
+  its.forEach(it=>{sub+=it.amount;pcs+=it.qty;});
+  const boxes=pcs>0?Math.ceil(pcs/6):0;
+  const dp=parseFloat(document.getElementById("disc").value)||0;
+  const dAmt=sub*dp/100,aft=sub-dAmt;
+  const sg=parseFloat(document.getElementById("sg").value)||0;
+  const cg=parseFloat(document.getElementById("cg").value)||0;
+  const ig=parseFloat(document.getElementById("ig").value)||0;
+  const sgA=aft*sg/100,cgA=aft*cg/100,igA=aft*ig/100,gst=sgA+cgA+igA;
+  const pack=parseFloat(document.getElementById("pack").value)||0;
+  const insur=parseFloat(document.getElementById("insur").value)||0;
+  const old=parseFloat(document.getElementById("old").value)||0;
+  const grand=aft+gst+pack+insur+old;
+  const paid=parseFloat(document.getElementById("paid").value)||0;
+  const f=n=>n.toLocaleString("en-IN",{maximumFractionDigits:2});
+  document.getElementById("tBox").textContent=boxes;
+  document.getElementById("tPcs").textContent=pcs;
+  document.getElementById("tSub").textContent="₹"+f(sub);
+  document.getElementById("tDisc").textContent="-₹"+f(dAmt);
+  document.getElementById("tGst").textContent="₹"+f(gst);
+  document.getElementById("tPack").textContent="₹"+f(pack+insur);
+  document.getElementById("tOld").textContent="₹"+f(old);
+  document.getElementById("tGrand").textContent="₹"+f(grand);
+  document.getElementById("rDisc").style.display=dAmt>0?"flex":"none";
+  document.getElementById("rGst").style.display=gst>0?"flex":"none";
+  document.getElementById("rPack").style.display=(pack+insur)>0?"flex":"none";
+  document.getElementById("rOld").style.display=old>0?"flex":"none";
+  document.getElementById("due").value=(grand-paid).toFixed(2);
+}
+
+// ===== CUSTOMER =====
+function sugCust(q){
+  q=(q||"").toLowerCase().trim();
+  const box=document.getElementById("cSug");
+  if(q.length<1){box.classList.remove("open");return;}
+  const m=Object.values(custs).filter(c=>c.name.toLowerCase().includes(q)||(c.phone||"").includes(q)).slice(0,5);
+  if(!m.length){box.classList.remove("open");return;}
+  box.innerHTML=m.map(c=>`
+    <div class="sug-item" onclick="pickC('${c.key.replace(/'/g,"\\'")}')">
+      <strong>${c.name}</strong>
+      <small>📞 ${c.phone||'—'}${c.gstin?' · '+c.gstin:''}${c.due>0?` · <span style="color:#C62828">Due: ₹${c.due.toLocaleString("en-IN")}</span>`:''}</small>
+    </div>`).join("");
+  box.classList.add("open");
+}
+
+function pickC(k){
+  const c=custs[k];if(!c)return;
+  const map={cName:"name",cPhone:"phone",cAddr:"addr",cState:"state",cCode:"code",cGstin:"gstin"};
+  Object.entries(map).forEach(([id,key])=>document.getElementById(id).value=c[key]||"");
+  document.getElementById("cSug").classList.remove("open");
+  if(c.due>0){
+    document.getElementById("old").value=c.due.toFixed(2);
+    const note=document.getElementById("custNote");
+    note.style.display="block";note.style.background="#FFE0E0";note.style.color="#C62828";
+    note.innerHTML=`⚠️ <b>${c.name}</b> · Outstanding: <b>₹${c.due.toLocaleString("en-IN")}</b>`;
+  }
+  recalc();
+}
+
+document.addEventListener("click",e=>{if(!e.target.closest(".sug-wrap"))document.getElementById("cSug").classList.remove("open");});
+
+// ===== NUMBER TO WORDS =====
+function n2w(n){
+  const a=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const b=['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if(!n)return"Zero Rupees Only";
+  const paise=Math.round((n%1)*100);
+  const ps=paise>0?` and ${paise} Paise`:"";
+  function w(x){if(x<20)return a[x];if(x<100)return b[Math.floor(x/10)]+(x%10?' '+a[x%10]:'');if(x<1000)return a[Math.floor(x/100)]+' Hundred'+(x%100?' '+w(x%100):'');return'';}
+  n=Math.floor(n);let s='';
+  if(n>=10000000){s+=w(Math.floor(n/10000000))+' Crore ';n%=10000000;}
+  if(n>=100000){s+=w(Math.floor(n/100000))+' Lakh ';n%=100000;}
+  if(n>=1000){s+=w(Math.floor(n/1000))+' Thousand ';n%=1000;}
+  if(n>0)s+=w(n);
+  return(s.trim()+' Rupees'+ps+' Only');
+}
+
+// ===== COLLECT =====
+function collect(){
+  const its=readItems();
+  let sub=0,pcs=0;
+  its.forEach(it=>{sub+=it.amount;pcs+=it.qty;});
+  const dp=parseFloat(document.getElementById("disc").value)||0;
+  const dAmt=sub*dp/100,aft=sub-dAmt;
+  const sg=parseFloat(document.getElementById("sg").value)||0;
+  const cg=parseFloat(document.getElementById("cg").value)||0;
+  const ig=parseFloat(document.getElementById("ig").value)||0;
+  const sgA=aft*sg/100,cgA=aft*cg/100,igA=aft*ig/100,gst=sgA+cgA+igA;
+  const pack=parseFloat(document.getElementById("pack").value)||0;
+  const insur=parseFloat(document.getElementById("insur").value)||0;
+  const old=parseFloat(document.getElementById("old").value)||0;
+  const grand=aft+gst+pack+insur+old;
+  const paid=parseFloat(document.getElementById("paid").value)||0;
+  return{
+    bType,invoiceNo:document.getElementById("bNo").value,
+    date:document.getElementById("bDate").value,mode:document.getElementById("bMode").value,
+    shopId:currentShop?.id||"",shopName:currentShop?.name||"",
+    bora:parseInt(document.getElementById("bora").value)||0,
+    totalBox:pcs>0?Math.ceil(pcs/6):0,
+    customer:{
+      name:document.getElementById("cName").value.trim(),
+      nameKey:document.getElementById("cName").value.trim().toLowerCase(),
+      phone:document.getElementById("cPhone").value.trim(),
+      addr:document.getElementById("cAddr").value.trim(),
+      state:document.getElementById("cState").value.trim(),
+      code:document.getElementById("cCode").value.trim(),
+      gstin:document.getElementById("cGstin").value.trim()
+    },
+    items:its,totalPcs:pcs,subTotal:sub,
+    discPct:dp,discAmt:dAmt,
+    sgPct:sg,sgAmt:sgA,cgPct:cg,cgAmt:cgA,igPct:ig,igAmt:igA,gstTotal:gst,
+    packing:pack,insurance:insur,oldBal:old,grandTotal:grand,
+    paidAmt:paid,dueAmt:grand-paid,inWords:n2w(grand)
+  };
+}
+
+function validate(){
+  if(!document.getElementById("cName").value.trim()){notice("❗ Customer name দিন","err");return false;}
+  if(!document.getElementById("cPhone").value.trim()){notice("❗ Mobile number দিন","err");return false;}
+  if(!readItems().some(it=>it.qty>0)){notice("❗ কমপক্ষে একটি item দিন","err");return false;}
+  return true;
+}
+
+// ===== SAVE =====
+async function saveInv(){
+  if(!validate())return null;
+  const b=collect();
+  try{
+    if(curId){
+      await window.FB.updateDoc(window.FB.doc(window.FB.db,"bills",curId),{...b,updatedAt:window.FB.serverTimestamp()});
+      notice("✅ Bill আপডেট হয়েছে · "+b.invoiceNo,"ok");
+      showSaveBanner("✅ Bill আপডেট হয়েছে! · "+b.invoiceNo);
+    }else{
+      const r=await window.FB.addDoc(window.FB.collection(window.FB.db,"bills"),{...b,createdAt:window.FB.serverTimestamp()});
+      curId=r.id;
+      await deductStock(b.items);
+      notice("✅ Bill save হয়েছে · "+b.invoiceNo+" · "+b.shopName,"ok");
+      showSaveBanner("✅ Bill save হয়েছে!\n"+b.invoiceNo+" · "+b.shopName);
+    }
+    return b;
+  }catch(e){notice("❌ Error: "+e.message,"err");alert("Bill save হয়নি!\nError: "+e.message);return null;}
+}
+
+function showSaveBanner(msg){
+  // Create big green banner
+  const banner=document.createElement("div");
+  banner.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#27ae60;color:#fff;padding:20px 28px;border-radius:14px;font-size:1.1rem;font-weight:700;z-index:500;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3);max-width:300px;white-space:pre-line;line-height:1.5";
+  banner.textContent=msg;
+  document.body.appendChild(banner);
+  setTimeout(()=>banner.remove(),2500);
+}
+
+// ===== BUILD BILL =====
+function buildCopy(b,copyLabel){
+  // Without GST copy will be B&W via CSS class
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+  const rows=[];
+  for(let i=0;i<14;i++){
+    const it=b.items?.[i];
+    if(it&&it.qty>0){rows.push(`<tr><td>${it.qty}</td><td class="tl">${it.desc||''}</td><td>${it.design||''}</td><td>${it.size||''}</td><td>${it.hsn||''}</td><td class="tr">₹${it.rate}</td><td class="tr">₹${fmt(it.amount)}</td></tr>`);}
+    else{rows.push(`<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>`);}
+  }
+  const dt=b.date?new Date(b.date).toLocaleDateString("en-GB"):"";
+  const isGST=b.bType==="GST";
+  const headerLeft=isGST
+    ?`<div class="bshop-main">${S.co}</div><div class="binfo"><b>${S.own}</b> · Mob: <b>${S.mob}</b><br/>${S.addr.replace(/\n/g,'<br/>')}</div>`
+    :`<div class="bshop-main">${S.co}</div><div class="bshop-sub"><span>${S.co2||'TESLA INDIA'}</span>${S.tag2?' — '+S.tag2:''}</div><div class="binfo"><b>${S.own}</b> · Mob: <b>${S.mob}</b><br/>${S.addr.replace(/\n/g,'<br/>')}</div>`;
+  const bwClass=' bw-copy';
+  return`<div class="bill-a4${bwClass}">
+    <div class="copy-label">${copyLabel}</div>
+    <div class="bh"><div>${headerLeft}</div>
+      <div>
+        <div style="font-weight:700;font-size:9.5pt;margin-bottom:5px">${isGST?"TAX INVOICE":"INVOICE"} ${isGST?"(GSTTIN) "+S.gstin:""}</div>
+        <table class="bivtbl">
+          <tr><td>INVOICE NO:</td><td>${b.invoiceNo}</td></tr>
+          <tr><td>INVOICE DATE</td><td>${dt}</td></tr>
+          <tr><td>MODE</td><td>${b.mode||''}</td></tr>
+          ${b.shopName?`<tr><td>SHOP</td><td>${b.shopName}</td></tr>`:''}
+        </table>
+      </div>
+    </div>
+    <div class="brcv">
+      <div class="brh">DETAILS OF RECEIVER</div><div class="brh">DETAILS OF CONSIGNEE</div>
+      <div>
+        <div class="brr"><b>NAME</b>${b.customer.name}</div>
+        <div class="brr"><b>ADDRESS</b>${b.customer.addr||''}</div>
+        <div class="brr"><b>STATE</b>${b.customer.state||''} &nbsp;<b>CODE:</b>${b.customer.code||''}</div>
+        ${isGST?`<div class="brr"><b>GST IN:</b>${b.customer.gstin||''}</div>`:''}
+      </div>
+      <div>
+        <div class="brr"><b>NAME</b>&nbsp;</div>
+        <div class="brr"><b>ADDRESS</b>&nbsp;</div>
+        <div class="brr"><b>STATE</b>&nbsp; &nbsp;<b>CODE:</b>&nbsp;</div>
+        ${isGST?`<div class="brr"><b>GST IN:</b>&nbsp;</div>`:''}
+      </div>
+    </div>
+    <table class="bitbl">
+      <thead><tr>
+        <th style="width:9%">QUANTITY</th><th style="width:21%">DESCRIPTION</th><th style="width:12%">DESIGN NO</th>
+        <th style="width:10%">SIZE</th><th style="width:13%">HSN CODE</th><th style="width:10%">RATE (₹)</th><th style="width:12%">AMOUNT (₹)</th>
+      </tr></thead>
+      <tbody>${rows.join("")}</tbody>
+    </table>
+    <div class="bfoot">
+      <div>
+        <table>
+          <tr><td>BORA</td><td>${b.bora||0}</td></tr>
+          <tr><td>TOTAL BOX</td><td>${b.totalBox||0}</td></tr>
+          <tr><td>TOTAL PCS</td><td>${b.totalPcs||0}</td></tr>
+        </table>
+        <div class="bbank"><b>BANK DETAIL</b><br/><b>BANK NAME:</b> ${S.bn}<br/><b>IFSC CODE:</b> ${S.bi}<br/><b>BANK A/C NO:</b> ${S.ba}${S.bu?`<br/><b>UPI:</b> ${S.bu}`:''}</div>
+      </div>
+      <div>
+        <table>
+          <tr><td>TOTAL:</td><td>₹${fmt(b.subTotal)}</td></tr>
+          <tr><td>DISCOUNT</td><td>${b.discPct||0}% &nbsp; ₹${fmt(b.discAmt)}</td></tr>
+          <tr><td>SUB TOTAL:</td><td>₹${fmt(b.subTotal-(b.discAmt||0))}</td></tr>
+          ${isGST?`<tr><td>SGST:</td><td>${b.sgPct||0}% &nbsp; ₹${fmt(b.sgAmt)}</td></tr><tr><td>CGST:</td><td>${b.cgPct||0}% &nbsp; ₹${fmt(b.cgAmt)}</td></tr><tr><td>IGST:</td><td>${b.igPct||0}% &nbsp; ₹${fmt(b.igAmt)}</td></tr><tr><td>TOTAL GST AMOUNT:</td><td>₹${fmt(b.gstTotal)}</td></tr>`:''}
+          <tr><td>PACKING CHARGE:</td><td>₹${fmt(b.packing)}</td></tr>
+          <tr><td>INSURANCE CHARGE:</td><td>₹${fmt(b.insurance)}</td></tr>
+          ${(b.oldBal||0)>0?`<tr><td style="">OLD BALANCE:</td><td>₹${fmt(b.oldBal)}</td></tr>`:''}
+          <tr class="bfg"><td>TOTAL AMOUNT:</td><td>₹${fmt(b.grandTotal)}</td></tr>
+          <tr><td>PAID AMOUNT:</td><td>₹${fmt(b.paidAmt)}</td></tr>
+          <tr class="bfd"><td>DUE AMOUNT:</td><td>₹${fmt(b.dueAmt)}</td></tr>
+          <tr><td>GST ON REV. CHARGE:</td><td>&nbsp;</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="bcond">1. PAYMENT WITHIN 30 DAYS FROM DATE OF INVOICE. &nbsp; 2. CHEQUE/DD SHOULD BE ISSUED IN FAVOR OF M GEETA SUPER. &nbsp; 3. SUBJECT TO KOLKATA JURISDICTION. &nbsp; 4. GOODS ONCE CANNOT BE TAKEN BACK! THANK YOU!</div>
+    <div class="bwords"><b>AMOUNT IN WORDS:</b> ${b.inWords}</div>
+    <div class="bsig">
+      <div class="bcert">CERTIFIED THAT THE PARTICULARS GIVEN ABOVE ARE TRUE &amp; CORRECT FOR ${S.co}${!isGST?' · '+S.co2:''}</div>
+      <div class="bsigbox"><div class="bsigline">SIGNATURE</div></div>
+    </div>
+  </div>`;
+}
+
+function buildAllCopies(b){
+  return b.bType==="GST"
+    ?buildCopy(b,"BUYER'S COPY")+buildCopy(b,"SELLER'S COPY")+buildCopy(b,"TRANSPORT COPY")
+    :buildCopy(b,"SELLER'S COPY");
+}
+
+// ===== PDF =====
+async function doPDF(){
+  if(!validate())return;
+  const btn=document.getElementById("pdfBtn");
+  btn.disabled=true;btn.textContent="⏳ PDF বানাচ্ছি...";
+  notice("💾 Bill save হচ্ছে...","info");
+  const b=await saveInv();
+  if(!b){btn.disabled=false;btn.innerHTML="📄 PDF Download";return;}
+  const copies=b.bType==="GST"?3:1;
+  // Lock invoice number before rendering
+  const lockedInvNo=b.invoiceNo;
+  notice(`⏳ PDF তৈরি হচ্ছে (${copies}টি copy)... একটু অপেক্ষা করুন`,"info");
+  document.getElementById("billWrap").innerHTML=buildAllCopies(b);
+  await new Promise(r=>setTimeout(r,1200));
+  try{
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    const divs=document.getElementById("billWrap").querySelectorAll(".bill-a4");
+    for(let i=0;i<divs.length;i++){
+      if(i>0)pdf.addPage();
+      divs[i].style.filter="grayscale(100%) contrast(1.05)";
+      const canvas=await html2canvas(divs[i],{scale:2,useCORS:true,allowTaint:true,backgroundColor:"#ffffff",logging:false,width:794,windowWidth:794});
+      divs[i].style.filter="";
+      pdf.addImage(canvas.toDataURL("image/jpeg",.94),"JPEG",0,0,210,Math.min((canvas.height*210)/canvas.width,297));
+    }
+    const fileName=`${b.invoiceNo}_${b.customer.name.replace(/\s+/g,"_")}.pdf`;
+    pdf.save(fileName);
+    // Show download success with folder button
+    const ov=document.createElement("div");
+    ov.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px";
+    ov.onclick=function(e){if(e.target===ov)ov.remove();};
+    ov.innerHTML=`<div style="background:#fff;border-radius:14px;padding:24px;max-width:320px;width:100%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.3)">
+      <div style="font-size:3rem;margin-bottom:10px">✅</div>
+      <div style="font-weight:800;font-size:1.1rem;color:#27ae60;margin-bottom:6px">PDF Download হয়েছে!</div>
+      <div style="font-size:.82rem;color:#555;margin-bottom:18px;background:#f5f5f5;padding:8px;border-radius:6px;word-break:break-all">${fileName}</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button onclick="openDownloads()" style="background:#1976D2;color:#fff;border:none;padding:13px;border-radius:8px;font-weight:700;font-size:.95rem;cursor:pointer;font-family:inherit">
+          📂 Downloads Folder খুলুন
+        </button>
+        <button id="pdfCloseBtn" style="background:#1A1208;color:#E8B84B;border:none;padding:13px;border-radius:8px;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;width:100%">
+          ✕ বন্ধ করুন
+        </button>
+      </div>
+      <div style="font-size:.72rem;color:#aaa;margin-top:10px">বাইরে tap করলেও বন্ধ হবে</div>
+    </div>`;
+    document.body.appendChild(ov);
+    document.getElementById('pdfCloseBtn').onclick=function(){ov.remove();};
+    notice(`✅ PDF ready! → Downloads folder এ দেখুন`,"ok");
+  }catch(e){
+    notice("❌ PDF error: "+e.message,"err");
+    alert("PDF তৈরিতে সমস্যা হয়েছে: "+e.message);
+  }
+  btn.disabled=false;btn.innerHTML="📄 PDF Download";
+}
+
+async function doPrint(){
+  if(!validate())return;
+  const b=await saveInv()||collect();
+  document.getElementById("billWrap").innerHTML=buildAllCopies(b);
+  await new Promise(r=>setTimeout(r,700));
+  window.print();
+}
+
+async function doWA(){
+  if(!validate())return;
+  const b=await saveInv();if(!b)return;
+  const phone=b.customer.phone.replace(/\D/g,"");
+  if(!phone){notice("❗ Mobile missing","err");return;}
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+  const brand=b.bType==="GST"?S.co:`${S.co} · ${S.co2}`;
+  const iLines=b.items.filter(it=>it.qty>0).map((it,i)=>`${i+1}. ${it.desc||'Item'}${it.design?' ('+it.design+')':''}${it.size?' ['+it.size+']':''}\n   ${it.qty} pcs × ₹${it.rate} = ₹${fmt(it.amount)}`).join("\n\n");
+  const msg=`🛍️ *${brand}*${b.shopName?' · '+b.shopName:''}\n${b.bType==="GST"?"TAX INVOICE · "+S.gstin:"INVOICE"}\n\n📋 *${b.invoiceNo}*\n📅 ${new Date(b.date).toLocaleDateString("en-GB")}\n\n👤 *${b.customer.name}*\n📞 ${b.customer.phone}\n📍 ${b.customer.addr}${b.customer.state?', '+b.customer.state:''}\n\n${iLines}\n\n━━━━━━━━━━━━━\nTotal Pcs: ${b.totalPcs} | Boxes: ${b.totalBox||0}\nSub Total: ₹${fmt(b.subTotal)}\n${b.discAmt>0?`Discount: ₹${fmt(b.discAmt)}\n`:''}${b.gstTotal>0?`GST: ₹${fmt(b.gstTotal)}\n`:''}━━━━━━━━━━━━━\n💰 *Total: ₹${fmt(b.grandTotal)}*\n${b.dueAmt>0?`⚠️ *Due: ₹${fmt(b.dueAmt)}*`:'✅ *Paid*'}\n📞 ${S.mob}`;
+  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+
+async function openEWay(){
+  if(!validate())return;
+  const b=await saveInv();if(!b)return;
+  const its=b.items.filter(it=>it.qty>0);
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:2});
+  const ov=document.createElement("div");
+  ov.id="ewayOv";
+  ov.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:300;overflow-y:auto;padding:14px";
+  ov.innerHTML=`<div style="max-width:680px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden">
+    <div style="background:#7B1FA2;color:#fff;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0">
+      <span style="font-weight:700">🚛 E-Way Bill · ${b.invoiceNo}</span>
+      <button onclick="document.getElementById('ewayOv').remove()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:700;font-family:inherit">← Back</button>
+    </div>
+    <div style="padding:14px">
+      <table style="width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:12px">
+        <tr style="background:#F3E5F5"><td style="padding:7px;font-weight:700;border:1px solid #CE93D8;width:45%">Field</td><td style="padding:7px;font-weight:700;border:1px solid #CE93D8">Value</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">Document No.</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700;color:#7B1FA2">${b.invoiceNo}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">Date</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">${b.date?new Date(b.date).toLocaleDateString("en-GB"):''}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">From GSTIN</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700;color:#1565C0">${S.gstin}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">To GSTIN</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">${b.customer.gstin||'URP'}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">To Name</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">${b.customer.name}</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">To State</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">${b.customer.state} (${b.customer.code})</td></tr>
+        <tr><td style="padding:6px 8px;border:1px solid #eee;color:#666">Transport</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">${b.mode||'Road'}</td></tr>
+        <tr style="background:#E8F5E9"><td style="padding:6px 8px;border:1px solid #eee;font-weight:700">Total Value</td><td style="padding:6px 8px;border:1px solid #eee;font-weight:800;color:#27ae60">₹${fmt(b.grandTotal)}</td></tr>
+      </table>
+      <div style="background:#FFF3E0;border-radius:6px;padding:10px;font-size:.8rem;color:#E65100;margin-bottom:12px"><b>HSN:</b> ${its.map(it=>`${it.design||''} · ${it.size||''} · ${it.hsn||'620342'} · ${it.qty}pcs`).join(' | ')}</div>
+      <button style="width:100%;background:#7B1FA2;color:#fff;border:none;padding:13px;border-radius:8px;font-weight:700;cursor:pointer" onclick="window.open('https://ewaybillgst.gov.in','_blank')">🚛 E-Way Bill Portal খুলুন</button>
+    </div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
+}
+
+function newInv(){
+  if(curId&&!confirm("New invoice? Current data cleared."))return;
+  curId=null;itemIds=[];itemCounter=0;
+  document.getElementById("itemsBox").innerHTML=`<p class="no-items" style="text-align:center;color:#888;padding:18px">No items. Click "+ Add Item".</p>`;
+  ["cName","cPhone","cAddr","cState","cCode","cGstin","bMode","disc","pack","insur","old","paid","bora"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("ig").value=bType==="GST"?"5":"0";
+  document.getElementById("sg").value="0";document.getElementById("cg").value="0";
+  document.getElementById("bDate").value=new Date().toISOString().slice(0,10);
+  document.getElementById("custNote").style.display="none";
+  document.getElementById("due").value="";
+  resetInvNo();recalc();pg("new");window.scrollTo(0,0);
+}
+
+// ===== BILL LIST =====
+function renderList(){
+  const q=(document.getElementById("srch").value||"").toLowerCase();
+  const f=document.getElementById("fltr").value;
+  const shopF=document.getElementById("shopFilter").value;
+  let list=[...allBills];
+  if(shopF==="mine"&&currentShop)list=list.filter(b=>b.shopId===currentShop.id);
+  if(q)list=list.filter(b=>(b.invoiceNo||"").toLowerCase().includes(q)||(b.customer?.name||"").toLowerCase().includes(q)||(b.customer?.phone||"").includes(q));
+  if(f==="GST")list=list.filter(b=>b.bType==="GST");
+  else if(f==="NoGST")list=list.filter(b=>b.bType==="NoGST");
+  else if(f==="due")list=list.filter(b=>(b.dueAmt||0)>0);
+  else if(f==="paid")list=list.filter(b=>(b.dueAmt||0)<=0);
+  const td=list.reduce((s,b)=>s+(b.dueAmt||0),0);
+  document.getElementById("lstat").value=`${list.length} bills · Due: ₹${td.toLocaleString("en-IN",{maximumFractionDigits:0})}`;
+  const box=document.getElementById("listBox");
+  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:30px;color:#888">No bills found</p>`;return;}
+  box.innerHTML=list.map(b=>`
+    <div class="bill-row" onclick="openB('${b.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:6px">
+        <div>
+          <div style="font-weight:800;color:#1A1208">${b.invoiceNo}<span class="badge ${b.bType==="GST"?"bgst":"binv"}">${b.bType}</span><span class="badge ${(b.dueAmt||0)>0?"bdue":"bpaid"}">${(b.dueAmt||0)>0?"DUE":"PAID"}</span>${b.shopName?`<span class="badge" style="background:#E8F5E9;color:#2E7D32">${b.shopName}</span>`:''}</div>
+          <div style="font-size:.88rem;margin-top:3px">👤 ${b.customer?.name||'—'}</div>
+          <div style="font-size:.78rem;color:#888">${b.date?new Date(b.date).toLocaleDateString("en-GB"):'—'} · ${b.totalPcs||0} pcs · ${b.totalBox||0} boxes</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:1.05rem;font-weight:800;color:#27ae60">₹${(b.grandTotal||0).toLocaleString("en-IN",{maximumFractionDigits:0})}</div>
+          ${(b.dueAmt||0)>0?`<div style="color:#C62828;font-size:.8rem;font-weight:700">Due: ₹${b.dueAmt.toLocaleString("en-IN",{maximumFractionDigits:0})}</div>`:''}
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function openB(id){
+  const b=allBills.find(x=>x.id===id);if(!b)return;
+  const ov=document.createElement("div");
+  ov.id="billOv";
+  ov.style.cssText="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:300;overflow-y:auto;padding:14px";
+  ov.innerHTML=`<div style="max-width:820px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden">
+    <div style="background:#1A1208;color:#E8B84B;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0">
+      <span style="font-weight:700">📋 ${b.invoiceNo} · ${b.shopName||''}</span>
+      <button onclick="document.getElementById('billOv').remove()" style="background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:6px;cursor:pointer;font-size:.9rem;font-weight:700;font-family:inherit">← Back</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;background:#f9f9f9;border-bottom:1px solid #eee">
+      <button class="btn binfo btn-sm" onclick="loadEdit('${id}')">✏️ Edit</button>
+      <button class="btn bpdf btn-sm" onclick="dlOne('${id}')">📄 PDF</button>
+      <button class="btn bwa btn-sm" onclick="waOne('${id}')">💬 WhatsApp</button>
+      <button class="btn bred btn-sm" onclick="delB('${id}')">🗑️ Delete</button>
+    </div>
+    <div style="padding:14px">${buildCopy(b,b.bType==="GST"?"BUYER'S COPY":"SELLER'S COPY")}</div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener("click",e=>{if(e.target===ov)ov.remove();});
+}
+
+function loadEdit(id){
+  const b=allBills.find(x=>x.id===id);if(!b)return;
+  document.getElementById("billOv")?.remove();
+  curId=id;bType=b.bType;setT(bType);
+  document.getElementById("bNo").value=b.invoiceNo;
+  document.getElementById("bDate").value=b.date;
+  document.getElementById("bMode").value=b.mode||"";
+  document.getElementById("bora").value=b.bora||"";
+  document.getElementById("cName").value=b.customer?.name||"";
+  document.getElementById("cPhone").value=b.customer?.phone||"";
+  document.getElementById("cAddr").value=b.customer?.addr||"";
+  document.getElementById("cState").value=b.customer?.state||"";
+  document.getElementById("cCode").value=b.customer?.code||"";
+  document.getElementById("cGstin").value=b.customer?.gstin||"";
+  itemIds=[];itemCounter=0;
+  document.getElementById("itemsBox").innerHTML="";
+  (b.items||[]).forEach(it=>addItem(it));
+  document.getElementById("disc").value=b.discPct||0;
+  document.getElementById("sg").value=b.sgPct||0;
+  document.getElementById("cg").value=b.cgPct||0;
+  document.getElementById("ig").value=b.igPct||0;
+  document.getElementById("pack").value=b.packing||"";
+  document.getElementById("insur").value=b.insurance||"";
+  document.getElementById("old").value=b.oldBal||"";
+  document.getElementById("paid").value=b.paidAmt||"";
+  recalc();pg("new");window.scrollTo(0,0);
+}
+
+async function dlOne(id){
+  const b=allBills.find(x=>x.id===id);if(!b)return;
+  document.getElementById("billOv")?.remove();
+  document.getElementById("billWrap").innerHTML=buildAllCopies(b);
+  await new Promise(r=>setTimeout(r,900));
+  try{
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    const divs=document.getElementById("billWrap").querySelectorAll(".bill-a4");
+    for(let i=0;i<divs.length;i++){
+      if(i>0)pdf.addPage();
+      divs[i].style.filter="grayscale(100%) contrast(1.05)";
+      const canvas=await html2canvas(divs[i],{scale:2,useCORS:true,backgroundColor:"#ffffff",width:794,windowWidth:794});
+      divs[i].style.filter="";
+      pdf.addImage(canvas.toDataURL("image/jpeg",.94),"JPEG",0,0,210,Math.min((canvas.height*210)/canvas.width,297));
+    }
+    pdf.save(`${b.invoiceNo}_${b.customer.name.replace(/\s+/g,"_")}.pdf`);
+  }catch(e){alert("PDF Error: "+e.message);}
+}
+
+function waOne(id){
+  const b=allBills.find(x=>x.id===id);if(!b)return;
+  const phone=(b.customer.phone||"").replace(/\D/g,"");
+  if(!phone){alert("No phone");return;}
+  const msg=`🛍️ *${S.co}* · ${b.shopName||''} · ${b.invoiceNo}\n👤 ${b.customer.name}\n💰 ₹${(b.grandTotal||0).toLocaleString("en-IN",{maximumFractionDigits:2})}\n${b.dueAmt>0?`⚠️ Due: ₹${b.dueAmt.toLocaleString("en-IN",{maximumFractionDigits:2})}`:'✅ Paid'}\n📞 ${S.mob}`;
+  window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+
+async function delB(id){
+  if(!confirm("Delete?"))return;
+  try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"bills",id));document.getElementById("billOv")?.remove();}
+  catch(e){alert("Error: "+e.message);}
+}
+
+// ===== OWNER DASHBOARD =====
+function renderDash(){
+  const box=document.getElementById("dashBox");
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:0});
+  const today=new Date().toISOString().slice(0,10);
+
+  // SALES
+  const gstBills=allBills.filter(b=>b.bType==="GST");
+  const noGstBills=allBills.filter(b=>b.bType==="NoGST");
+  const gstSale=gstBills.reduce((s,b)=>s+(b.grandTotal||0),0);
+  const noGstSale=noGstBills.reduce((s,b)=>s+(b.grandTotal||0),0);
+  const totalSale=gstSale+noGstSale;
+  const totalDue=allBills.reduce((s,b)=>s+(b.dueAmt||0),0);
+  const totalGST=allBills.reduce((s,b)=>s+(b.gstTotal||0),0);
+  const totalBills=allBills.length;
+
+  // PURCHASE
+  const totalPurchase=purchases.reduce((s,p)=>s+(p.total||0),0);
+  const totalPurchaseDue=purchases.reduce((s,p)=>s+(p.due||0),0);
+
+  // PURCHASE by category
+  const catTotals={};
+  purchases.forEach(p=>{
+    if(!catTotals[p.cat])catTotals[p.cat]={total:0};
+    catTotals[p.cat].total+=(p.total||0);
+  });
+
+  // NET
+  const netProfit=totalSale-totalPurchase;
+
+  // TODAY
+  const todayBills=allBills.filter(b=>b.date===today);
+  const todaySale=todayBills.reduce((s,b)=>s+(b.grandTotal||0),0);
+  const todayPurchase=purchases.filter(p=>p.date===today).reduce((s,p)=>s+(p.total||0),0);
+
+  // PER SHOP
+  const shopStats={};
+  shops.forEach(s=>{shopStats[s.id]={name:s.name,bills:0,sale:0,due:0};});
+  allBills.forEach(b=>{
+    const sid=b.shopId;
+    if(!shopStats[sid])shopStats[sid]={name:b.shopName||sid,bills:0,sale:0,due:0};
+    shopStats[sid].bills++;shopStats[sid].sale+=(b.grandTotal||0);shopStats[sid].due+=(b.dueAmt||0);
+  });
+
+  box.innerHTML=`
+    <!-- MAIN STATS -->
+    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">💰 Sales Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div class="dash-stat" style="border-left:4px solid #1565C0">
+        <div class="num" style="color:#1565C0">₹${fmt(gstSale)}</div>
+        <div class="lbl">GST Sale (${gstBills.length} bills)</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #6A1B9A">
+        <div class="num" style="color:#6A1B9A">₹${fmt(noGstSale)}</div>
+        <div class="lbl">Without GST Sale (${noGstBills.length} bills)</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #27ae60">
+        <div class="num" style="color:#27ae60">₹${fmt(totalSale)}</div>
+        <div class="lbl">মোট Sale (${totalBills} bills)</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #C62828">
+        <div class="num" style="color:#C62828">₹${fmt(totalDue)}</div>
+        <div class="lbl">বাকি (Due)</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #F57F17">
+        <div class="num" style="color:#F57F17">₹${fmt(totalGST)}</div>
+        <div class="lbl">মোট GST Amount</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #00897B">
+        <div class="num" style="color:#00897B">₹${fmt(todaySale)}</div>
+        <div class="lbl">আজকের Sale</div>
+      </div>
+    </div>
+
+    <!-- PURCHASE SUMMARY -->
+    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🛒 Purchase Summary</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div class="dash-stat" style="border-left:4px solid #E65100">
+        <div class="num" style="color:#E65100">₹${fmt(totalPurchase)}</div>
+        <div class="lbl">মোট Purchase (${purchases.length}টি)</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #C62828">
+        <div class="num" style="color:#C62828">₹${fmt(totalPurchaseDue)}</div>
+        <div class="lbl">Purchase বাকি</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid #00897B">
+        <div class="num" style="color:#00897B">₹${fmt(todayPurchase)}</div>
+        <div class="lbl">আজকের Purchase</div>
+      </div>
+      <div class="dash-stat" style="border-left:4px solid ${netProfit>=0?'#27ae60':'#C62828'}">
+        <div class="num" style="color:${netProfit>=0?'#27ae60':'#C62828'}">${netProfit>=0?'+':''}₹${fmt(Math.abs(netProfit))}</div>
+        <div class="lbl">${netProfit>=0?'📈 Net Profit':'📉 Net Loss'}</div>
+      </div>
+    </div>
+
+    <!-- SALE VS PURCHASE BAR -->
+    <div style="background:#fff;border-radius:8px;padding:12px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <div style="font-weight:700;font-size:.85rem;margin-bottom:8px;color:#1A1208">📊 Sale vs Purchase</div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span style="color:#27ae60">Sale ₹${fmt(totalSale)}</span><span>${totalSale>0?'100%':'0%'}</span></div>
+        <div style="background:#eee;border-radius:4px;height:10px"><div style="background:#27ae60;height:10px;border-radius:4px;width:100%"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:3px"><span style="color:#E65100">Purchase ₹${fmt(totalPurchase)}</span><span>${totalSale>0?Math.round(totalPurchase/totalSale*100)+'%':'0%'}</span></div>
+        <div style="background:#eee;border-radius:4px;height:10px"><div style="background:#E65100;height:10px;border-radius:4px;width:${totalSale>0?Math.min(100,Math.round(totalPurchase/totalSale*100)):0}%"></div></div>
+      </div>
+    </div>
+
+    <!-- PURCHASE BY CATEGORY -->
+    ${Object.keys(catTotals).length>0?`
+    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🛒 Category অনুযায়ী খরচ</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px">
+      ${Object.entries(catTotals).sort((a,b)=>b[1].total-a[1].total).map(([cat,d])=>{
+        const c=CATS.find(x=>x.id===cat)||{icon:"💡",color:"#666",bg:"#eee"};
+        return`<div style="background:${c.bg};border-radius:7px;padding:9px;border-left:3px solid ${c.color}">
+          <div style="font-size:.8rem;font-weight:700;color:${c.color}">${c.icon} ${cat}</div>
+          <div style="font-size:.92rem;font-weight:800;color:#1A1208;margin-top:2px">₹${fmt(d.total)}</div>
+        </div>`;
+      }).join("")}
+    </div>`:''}
+
+    <!-- PER SHOP -->
+    <div style="font-weight:800;color:#1A1208;margin-bottom:10px;font-size:.95rem">🏪 দোকান অনুযায়ী Sale</div>
+    ${Object.values(shopStats).filter(s=>s.bills>0).map(s=>`
+      <div class="shop-stat-row">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+          <div>
+            <div style="font-weight:700;font-size:.92rem">${s.name}</div>
+            <div style="font-size:.78rem;color:#888;margin-top:2px">${s.bills} bills</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:700;color:#27ae60;font-size:.95rem">₹${fmt(s.sale)}</div>
+            ${s.due>0?`<div style="color:#C62828;font-size:.8rem">Due: ₹${fmt(s.due)}</div>`:'<div style="color:#27ae60;font-size:.78rem">✅ All paid</div>'}
+          </div>
+        </div>
+      </div>`).join("")}
+
+    <!-- TODAY'S BILLS -->
+    <div style="margin-top:14px;font-weight:800;color:#1A1208;margin-bottom:8px;font-size:.95rem">📅 আজকের Bills (${today})</div>
+    ${todayBills.length===0?'<p style="color:#888;font-size:.85rem;padding:10px 0">আজকে কোনো bill নেই।</p>':
+    todayBills.map(b=>`<div style="background:#f9f9f9;border-radius:7px;padding:9px 12px;margin-bottom:6px;font-size:.85rem;border-left:3px solid ${b.bType==='GST'?'#1565C0':'#6A1B9A'}">
+      <div style="font-weight:700">${b.invoiceNo} <span style="color:#666;font-weight:400;font-size:.78rem">${b.shopName||''} · ${b.bType}</span></div>
+      <div>👤 ${b.customer?.name||'—'} · <b>₹${fmt(b.grandTotal)}</b></div>
+    </div>`).join("")}`;
+}
+
+// ===== CUSTOMERS =====
+function buildC(){
+  custs={};
+  allBills.forEach(b=>{
+    const k=(b.customer?.nameKey||b.customer?.name||"").toLowerCase().trim();
+    if(!k)return;
+    if(!custs[k])custs[k]={key:k,name:b.customer.name,phone:b.customer.phone,addr:b.customer.addr,state:b.customer.state,code:b.customer.code,gstin:b.customer.gstin,cnt:0,due:0};
+    custs[k].cnt++;custs[k].due+=(b.dueAmt||0);
+  });
+  savedContacts.forEach(c=>{
+    const k=(c.name||"").toLowerCase().trim();
+    if(!custs[k])custs[k]={key:k,name:c.name,phone:c.phone,addr:c.addr,state:c.state,code:c.code,gstin:c.gstin,cnt:0,due:0,savedId:c.id};
+    else{custs[k].phone=custs[k].phone||c.phone;custs[k].gstin=custs[k].gstin||c.gstin;custs[k].savedId=c.id;}
+  });
+}
+
+function renderCustList(){
+  const q=(document.getElementById("custSrch")?.value||"").toLowerCase();
+  let list=savedContacts.map(c=>({...c,fromSaved:true}));
+  Object.values(custs).forEach(c=>{if(!c.savedId&&!list.find(x=>(x.name||"").toLowerCase()===c.key))list.push({...c,fromBill:true});});
+  if(q)list=list.filter(c=>(c.name||"").toLowerCase().includes(q)||(c.phone||"").includes(q)||(c.gstin||"").toLowerCase().includes(q));
+  list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  const box=document.getElementById("custListBox");
+  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:30px;color:#888">No customers found</p>`;return;}
+  box.innerHTML=list.map(c=>{
+    const cd=custs[(c.name||"").toLowerCase()];
+    const due=cd?cd.due:0;
+    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid ${due>0?'#eb5757':'#27ae60'}">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+        <div>
+          <div style="font-weight:800">${c.name}</div>
+          <div style="font-size:.82rem;color:#444">📞 ${c.phone||'—'}${c.gstin?` · 🆔 <b>${c.gstin}</b>`:''}</div>
+          ${c.addr?`<div style="font-size:.78rem;color:#666">📍 ${c.addr}${c.state?' · '+c.state:''}</div>`:''}
+          <div style="font-size:.75rem;color:#888">${cd?cd.cnt:0} bills · ${due>0?`<span style="color:#eb5757;font-weight:700">Due: ₹${due.toLocaleString("en-IN",{maximumFractionDigits:0})}</span>`:'<span style="color:#27ae60">All paid</span>'}</div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;align-items:flex-start">
+          <button class="btn bg btn-sm" onclick="useCustBill('${(c.id||"_"+c.key).replace(/'/g,"\\'")}')">🧾 Bill</button>
+          ${c.id?`<button class="btn binfo btn-sm" onclick="openEditCust('${c.id}')">✏️</button><button class="btn bred btn-sm" onclick="delCust('${c.id}')">🗑️</button>`:'<button class="btn bghost btn-sm" onclick="saveFromBill(\''+c.key+'\')">💾</button>'}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function openAddCust(){
+  ["fc_id","fc_name","fc_phone","fc_addr","fc_state","fc_code","fc_gstin"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+  document.getElementById("custFormTitle").textContent="➕ New Customer";
+  document.getElementById("custFormCard").style.display="block";
+  document.getElementById("custFormCard").scrollIntoView({behavior:"smooth"});
+  setTimeout(()=>document.getElementById("fc_name").focus(),100);
+}
+
+function openEditCust(id){
+  const c=savedContacts.find(x=>x.id===id);if(!c)return;
+  document.getElementById("fc_id").value=id;
+  document.getElementById("fc_name").value=c.name||"";
+  document.getElementById("fc_phone").value=c.phone||"";
+  document.getElementById("fc_addr").value=c.addr||"";
+  document.getElementById("fc_state").value=c.state||"";
+  document.getElementById("fc_code").value=c.code||"";
+  document.getElementById("fc_gstin").value=c.gstin||"";
+  document.getElementById("custFormTitle").textContent="✏️ Edit Customer";
+  document.getElementById("custFormCard").style.display="block";
+  document.getElementById("custFormCard").scrollIntoView({behavior:"smooth"});
+}
+
+function closeCustForm(){document.getElementById("custFormCard").style.display="none";}
+
+async function saveCust(){
+  const name=document.getElementById("fc_name").value.trim();
+  const phone=document.getElementById("fc_phone").value.trim();
+  if(!name||!phone){alert("নাম এবং মোবাইল দিন");return;}
+  const data={name,nameKey:name.toLowerCase(),phone,addr:document.getElementById("fc_addr").value.trim(),state:document.getElementById("fc_state").value.trim(),code:document.getElementById("fc_code").value.trim(),gstin:document.getElementById("fc_gstin").value.trim()};
+  try{
+    const editId=document.getElementById("fc_id").value;
+    if(editId)await window.FB.updateDoc(window.FB.doc(window.FB.db,"contacts",editId),data);
+    else{data.createdAt=window.FB.serverTimestamp();await window.FB.addDoc(window.FB.collection(window.FB.db,"contacts"),data);}
+    closeCustForm();notice("✅ Customer saved!","ok");
+  }catch(e){alert("Error: "+e.message);}
+}
+
+async function delCust(id){
+  if(!confirm("Delete?"))return;
+  try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"contacts",id));}
+  catch(e){alert("Error: "+e.message);}
+}
+
+function useCustBill(idOrKey){
+  let c;
+  if(idOrKey.startsWith("_")){
+    const k=idOrKey.substring(1);
+    const cd=custs[k];if(!cd)return;
+    c={name:cd.name,phone:cd.phone,addr:cd.addr,state:cd.state,code:cd.code,gstin:cd.gstin,due:cd.due};
+  }else{
+    c=savedContacts.find(x=>x.id===idOrKey);
+    if(!c)return;
+    const cd=custs[(c.name||"").toLowerCase()];
+    if(cd)c={...c,due:cd.due};
+  }
+  document.getElementById("cName").value=c.name||"";
+  document.getElementById("cPhone").value=c.phone||"";
+  document.getElementById("cAddr").value=c.addr||"";
+  document.getElementById("cState").value=c.state||"";
+  document.getElementById("cCode").value=c.code||"";
+  document.getElementById("cGstin").value=c.gstin||"";
+  if(c.due>0){
+    document.getElementById("old").value=c.due.toFixed(2);
+    const note=document.getElementById("custNote");
+    note.style.display="block";note.style.background="#FFE0E0";note.style.color="#C62828";
+    note.innerHTML=`⚠️ <b>${c.name}</b> · Due: <b>₹${c.due.toLocaleString("en-IN")}</b>`;
+  }
+  recalc();pg("new");window.scrollTo(0,0);
+  notice("✅ Customer loaded: "+c.name,"ok");
+}
+
+async function saveFromBill(nameKey){
+  const c=custs[nameKey];if(!c)return;
+  try{await window.FB.addDoc(window.FB.collection(window.FB.db,"contacts"),{name:c.name,nameKey:(c.name||"").toLowerCase(),phone:c.phone||"",addr:c.addr||"",state:c.state||"",code:c.code||"",gstin:c.gstin||"",createdAt:window.FB.serverTimestamp()});notice("✅ Saved to contacts!","ok");}
+  catch(e){alert("Error: "+e.message);}
+}
+
+// ===== STOCK =====
+function setStockFilter(f){
+  stockFilter=f;
+  ["all","low","out"].forEach(x=>{const btn=document.getElementById("sf-"+x);if(btn){btn.style.background=x===f?"#1A1208":"#eee";btn.style.color=x===f?"#E8B84B":"#333";}});
+  renderStock();
+}
+
+function renderStock(){
+  const q=(document.getElementById("stockSrch")?.value||"").toLowerCase();
+  let list=[...shopProducts];
+  if(q)list=list.filter(p=>(p.design||"").toLowerCase().includes(q)||(p.size||"").toLowerCase().includes(q));
+  if(stockFilter==="low")list=list.filter(p=>(p.stock||0)>0&&(p.stock||0)<=12);
+  else if(stockFilter==="out")list=list.filter(p=>(p.stock||0)<=0);
+  const box=document.getElementById("stockBox");if(!box)return;
+  const total=shopProducts.length,low=shopProducts.filter(p=>(p.stock||0)>0&&(p.stock||0)<=12).length,out=shopProducts.filter(p=>(p.stock||0)<=0).length;
+  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:30px;color:#888">No products found</p>`;return;}
+  box.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+    <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#27ae60">${total}</div><div style="font-size:.75rem;color:#555">Total</div></div>
+    <div style="background:#FFF3E0;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#E65100">${low}</div><div style="font-size:.75rem;color:#555">⚠️ Low</div></div>
+    <div style="background:#FFE0E0;border-radius:8px;padding:12px;text-align:center"><div style="font-size:1.4rem;font-weight:800;color:#C62828">${out}</div><div style="font-size:.75rem;color:#555">❌ Out</div></div>
+  </div>`+list.map(p=>{
+    const s=p.stock||0,c=s<=0?"#C62828":s<=12?"#E65100":"#27ae60",bg=s<=0?"#FFE0E0":s<=12?"#FFF3E0":"#E8F5E9";
+    const photos=p.photos||[];
+    const img=photos.length>0?`<img src="${photos[0]}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0" onerror="this.style.display='none'"/>`:
+      `<div style="width:48px;height:48px;background:#F0E6C8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${p.type==='বাবা স্যুট'?'👘':'👔'}</div>`;
+    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:10px;margin-bottom:8px;display:flex;gap:10px;align-items:center;border-left:4px solid ${c}">
+      ${img}
+      <div style="flex:1"><div style="font-weight:700;font-size:.9rem">${p.design||'—'} <span style="font-size:.75rem;color:#666">(${p.type||''})</span></div>
+      <div style="font-size:.8rem;color:#444">Size: <b>${p.size||'—'}</b> · ₹${p.price||'—'}</div></div>
+      <div style="text-align:center;background:${bg};padding:8px 12px;border-radius:8px;min-width:65px">
+        <div style="font-size:1.2rem;font-weight:800;color:${c}">${s}</div>
+        <div style="font-size:.65rem;color:${c};font-weight:600">${s<=0?"❌ OUT":s<=12?"⚠️ LOW":"✅ OK"}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ===== SETTINGS =====
+async function saveSett(){
+  const np=document.getElementById("sPass").value;
+  const np2=document.getElementById("sPass2").value;
+  if(np&&np!==np2){alert("Password match করছে না!");return;}
+  S={...S,
+    co:document.getElementById("sCo").value,co2:document.getElementById("sCo2").value,
+    own:document.getElementById("sOwn").value,mob:document.getElementById("sMob").value,
+    gstin:document.getElementById("sGst").value,addr:document.getElementById("sAddr").value,
+    bn:document.getElementById("sBN").value,bi:document.getElementById("sBI").value,
+    ba:document.getElementById("sBA").value,bu:document.getElementById("sBU").value,
+    gstPre:document.getElementById("sGSTpre").value,invPre:document.getElementById("sINVpre").value,
+    year:document.getElementById("sYear").value,start:parseInt(document.getElementById("sStart").value)||1
+  };
+  if(np)S.password=np;
+  try{
+    await window.FB.setDoc(window.FB.doc(window.FB.db,"billing_settings","main"),S);
+    alert("✅ Settings saved!");resetInvNo();
+  }catch(e){alert("Error: "+e.message);}
+}
+
+function loadS(d){
+  Object.assign(S,d);
+  const map={"sCo":"co","sCo2":"co2","sOwn":"own","sMob":"mob","sGst":"gstin","sAddr":"addr","sBN":"bn","sBI":"bi","sBA":"ba","sBU":"bu","sGSTpre":"gstPre","sINVpre":"invPre","sYear":"year","sStart":"start"};
+  Object.entries(map).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.value=S[key]||"";});
+}
+
+function notice(msg,type){
+  const n=document.getElementById("notice");if(!n)return;
+  n.className="notice "+type;n.textContent=msg;
+  clearTimeout(n._t);n._t=setTimeout(()=>{n.style.display="none";n.className="notice";},5000);
+}
+
+// Expose globals
+window.doLogin=doLogin;window.doLogout=doLogout;window.showShopScreen=showShopScreen;
+window.selShop=selShop;window.enterShop=enterShop;window.enterDashboard=enterDashboard;window.switchShop=switchShop;
+window.addShopPrompt=addShopPrompt;window.editShop=editShop;window.removeShop=removeShop;
+window.pg=pg;window.setT=setT;window.resetInvNo=resetInvNo;
+window.addItem=addItem;window.updAmt=updAmt;window.rmItem=rmItem;window.recalc=recalc;
+window.checkStock=checkStock;window.setStockFilter=setStockFilter;window.renderStock=renderStock;
+window.autoStateFromGST=autoStateFromGST;window.autoStateForCust=autoStateForCust;
+window.sugCust=sugCust;window.pickC=pickC;
+window.saveInv=saveInv;function openDownloads(){
+  // Try different methods to open downloads
+  const ua=navigator.userAgent.toLowerCase();
+  if(ua.includes("android")){
+    // Android — try to open Downloads via intent
+    try{window.open("content://downloads/public_downloads","_blank");}catch(e){}
+    try{window.open("file:///sdcard/Download/","_blank");}catch(e){}
+    // Show instruction
+    const msg=document.createElement("div");
+    msg.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1208;color:#E8B84B;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:600;text-align:center;max-width:280px;line-height:1.5";
+    msg.innerHTML="📱 Files app খুলুন<br/>→ Downloads folder দেখুন";
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),3000);
+  }else if(ua.includes("iphone")||ua.includes("ipad")){
+    const msg=document.createElement("div");
+    msg.style.cssText="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1A1208;color:#E8B84B;padding:12px 18px;border-radius:10px;font-size:.85rem;font-weight:600;z-index:600;text-align:center;max-width:280px;line-height:1.5";
+    msg.innerHTML="📱 Files app খুলুন<br/>→ On My iPhone → Downloads";
+    document.body.appendChild(msg);
+    setTimeout(()=>msg.remove(),3000);
+  }else{
+    // Desktop
+    window.open("downloads:","_blank")||window.open("file:///C:/Users/"+encodeURIComponent(navigator.userAgent),"_blank");
+    alert("Downloads folder:\nWindows: C:\\Users\\[আপনার নাম]\\Downloads\nMac: ~/Downloads");
+  }
+}
+
+function parseBarcode(val){
+  // Support formats:
+  // "1901-16/18" → design: 1901, size: 16/18
+  // "1901 16/18" → design: 1901, size: 16/18
+  // "1901-20/30" → design: 1901, size: 20/30
+  // "1901" → design: 1901, size: ""
+  val=val.trim();
+  let design=val, size="";
+
+  // Try split by space first (e.g. "1901 20/30")
+  if(val.includes(" ")){
+    const sp=val.split(" ");
+    const last=sp[sp.length-1];
+    if(last.includes("/")||/^(XS|S|M|L|XL|XXL)$/i.test(last)){
+      size=last;
+      design=sp.slice(0,-1).join(" ");
+      return{design,size};
+    }
+  }
+
+  // Try split by dash (e.g. "1901-16/18")
+  if(val.includes("-")){
+    const dp=val.split("-");
+    const last=dp[dp.length-1];
+    if(last.includes("/")||/^(XS|S|M|L|XL|XXL)$/i.test(last)){
+      size=last;
+      design=dp.slice(0,-1).join("-");
+      return{design,size};
+    }
+  }
+
+  return{design,size};
+}
+let scanItemId=null, scanActive=false;
+
+async function startScan(itemId){
+  scanItemId=itemId;
+  scanActive=true;
+  document.getElementById("scanResult").style.display="none";
+  document.getElementById("scanVal").textContent="";
+  document.getElementById("scanLoading").style.display="block";
+  document.getElementById("scanModal").classList.add("open");
+  await new Promise(r=>setTimeout(r,300));
+
+  Quagga.init({
+    inputStream:{
+      name:"Live",type:"LiveStream",
+      target:document.getElementById("scanViewport"),
+      constraints:{facingMode:"environment",width:{ideal:640},height:{ideal:480}}
+    },
+    locator:{patchSize:"medium",halfSample:true},
+    numOfWorkers:2,frequency:10,
+    decoder:{readers:["code_128_reader","ean_reader","ean_8_reader","code_39_reader","upc_reader"]},
+    locate:true
+  },function(err){
+    if(err){alert("Camera চালু হয়নি। Permission দিন।\n"+err.message);stopScan();return;}
+    document.getElementById("scanLoading").style.display="none";
+    Quagga.start();
+  });
+
+  Quagga.onDetected(function(data){
+    if(!scanActive)return;
+    const code=data.result.codeResult.code;
+    if(!code)return;
+    const{design,size}=parseBarcode(code);
+    document.getElementById("scanVal").textContent=code;
+    document.getElementById("scanResult").style.display="block";
+    document.getElementById("scanResult").innerHTML=`✅ <b>Design: ${design}</b>${size?` · <b>Size: ${size}</b>`:''}`;
+    if(navigator.vibrate)navigator.vibrate([100,50,100]);
+    // Auto confirm after 1 second
+    setTimeout(()=>{if(scanActive)confirmScan();},1000);
+  });
+}
+
+function onManualInput(val){
+  if(!val.trim()){document.getElementById("manualResult").style.display="none";return;}
+  const{design,size}=parseBarcode(val);
+  const el=document.getElementById("manualResult");
+  el.style.display="block";
+  el.textContent=`✓ Design: ${design}${size?' · Size: '+size:''}`;
+  document.getElementById("scanVal").textContent=val;
+  document.getElementById("scanResult").style.display="block";
+  document.getElementById("scanResult").innerHTML=`✅ <b>Design: ${design}</b>${size?` · <b>Size: ${size}</b>`:''}`;
+}
+
+function confirmScan(){
+  const manual=(document.getElementById("manualBarcode")?.value||"").trim();
+  const scanned=document.getElementById("scanVal").textContent.trim();
+  const val=manual||scanned;
+  if(!val){notice("❗ Barcode scan করুন অথবা manually লিখুন","err");return;}
+  const{design,size}=parseBarcode(val);
+  if(scanItemId!==null){
+    const designEl=document.getElementById("d-design-"+scanItemId);
+    if(designEl)designEl.value=design;
+    if(size){const sizeEl=document.getElementById("d-size-"+scanItemId);if(sizeEl)sizeEl.value=size;}
+    checkStock(scanItemId);
+    notice(`✅ Design: ${design}${size?' · Size: '+size:''}`, "ok");
+  }
+  stopScan();
+}
+
+function stopScan(){
+  scanActive=false;
+  try{Quagga.stop();}catch(e){}
+  document.getElementById("scanModal").classList.remove("open");
+  const mb=document.getElementById("manualBarcode");if(mb)mb.value="";
+  const mr=document.getElementById("manualResult");if(mr)mr.style.display="none";
+  scanItemId=null;
+}
+
+window.startScan=startScan;window.confirmScan=confirmScan;window.stopScan=stopScan;window.onManualInput=onManualInput;
+window.addEventListener("popstate",()=>{
+  const ovs=["billOv","ewayOv"];
+  for(const id of ovs){
+    const el=document.getElementById(id);
+    if(el){el.remove();return;}
+  }
+  // If on inner page, go to new invoice
+  const active=["list","cust","stock","dash","sett"].find(t=>
+    document.getElementById("pg-"+t)?.style.display==="block"
+  );
+  if(active)pg("new");
+});
+
+// Push state when overlay opens
+function pushState(){history.pushState({overlay:true},"")}
+window.pushState=pushState;window.doPDF=doPDF;window.doPrint=doPrint;window.doWA=doWA;window.openEWay=openEWay;window.newInv=newInv;
+window.renderList=renderList;window.openB=openB;window.loadEdit=loadEdit;window.dlOne=dlOne;window.waOne=waOne;window.delB=delB;
+window.openAddCust=openAddCust;window.openEditCust=openEditCust;window.closeCustForm=closeCustForm;window.saveCust=saveCust;window.delCust=delCust;window.useCustBill=useCustBill;window.saveFromBill=saveFromBill;window.renderCustList=renderCustList;
+window.renderDash=renderDash;window.saveSett=saveSett;
+
+// ===== COSTING CALCULATOR =====
+var cDefaultItems=[
+  {id:"cutting",label:"কাটিং",value:3,group:"general"},
+  {id:"sewing",label:"সেলাই",value:16,group:"general"},
+  {id:"embroidery",label:"এমব্রোটেরি",value:4,group:"general"},
+  {id:"box",label:"বক্স",value:5,group:"general"},
+  {id:"color_iron",label:"কালার ইস্ত্রি",value:0,group:"general"},
+  {id:"color_bukram",label:"কালার বক্রম",value:0,group:"general"},
+  {id:"ticket",label:"টিকিট",value:0,group:"general"},
+  {id:"tag",label:"ট্যাগ",value:0,group:"general"},
+  {id:"pp_paper",label:"PP পেপার",value:0,group:"general"},
+  {id:"pin",label:"পিন",value:0,group:"general"},
+  {id:"clip",label:"ক্লিপ",value:0,group:"general"},
+  {id:"electric",label:"ইলেকট্রিক",value:0,group:"general"},
+  {id:"labour",label:"লেবার চার্জ",value:0,group:"general"},
+  {id:"paper",label:"পেপার",value:2,group:"general"},
+  {id:"button",label:"বোতাম",value:3,group:"general"},
+  {id:"label_cost",label:"লেবেল",value:2,group:"general"},
+  {id:"iron",label:"ইস্ত্রি",value:3,group:"general"},
+  {id:"pant_cutting",label:"প্যান্ট কাটিং",value:0,group:"pant"},
+  {id:"pant_sewing",label:"প্যান্ট সেলাই",value:0,group:"pant"},
+  {id:"pant_embroidery",label:"প্যান্ট এমব্রোটারি",value:0,group:"pant"},
+  {id:"pant_elastic",label:"প্যান্ট ইলাস্টিক",value:0,group:"pant"},
+  {id:"pant_wash",label:"প্যান্ট ওয়াশ",value:0,group:"pant"},
+  {id:"pant_chain",label:"চেইন",value:0,group:"pant"},
+  {id:"pant_pocketing",label:"পোকেটিং",value:0,group:"pant"},
+  {id:"pant_button",label:"বোতাম (প্যান্ট)",value:0,group:"pant"},
+  {id:"pant_ticket",label:"টিকিট (প্যান্ট)",value:0,group:"pant"}
+];
+
+var cItems=JSON.parse(JSON.stringify(cDefaultItems));
+var cSavedDesigns=[];
+
+function cLoadSaved(){
+  try{var r=localStorage.getItem("geeta_designs2");if(r)cSavedDesigns=JSON.parse(r);}catch(e){cSavedDesigns=[];}
+  const el=document.getElementById("cSavedCount");if(el)el.textContent=cSavedDesigns.length;
+}
+
+function cPersist(){
+  try{localStorage.setItem("geeta_designs2",JSON.stringify(cSavedDesigns));}catch(e){}
+  const el=document.getElementById("cSavedCount");if(el)el.textContent=cSavedDesigns.length;
+}
+
+function cGetNum(id){return Number(document.getElementById(id)?.value)||0;}
+function cFmt(n){return Number(n).toFixed(2);}
+
+function cRenderItems(){
+  const gen=cItems.filter(i=>i.group!=="pant");
+  const pant=cItems.filter(i=>i.group==="pant");
+  const rowStyle="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0f2a0f";
+  const inputStyle="background:rgba(46,204,113,0.07);border:1px solid #2d4a2d;border-radius:6px;color:#c8e6c9;padding:6px 8px;font-size:14px;font-weight:600;width:70px;font-family:inherit;outline:none";
+  function rowHTML(i){
+    return`<div style="${rowStyle}">
+      <div style="flex:1;font-size:14px;font-weight:600;color:#c8e6c9">${i.label}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="color:#5a7a5a;font-size:12px">৳</span>
+        <input type="number" min="0" value="${i.value}" oninput="cSetItem('${i.id}',this.value)" style="${inputStyle}"/>
+        <button onclick="cRemoveItem('${i.id}')" style="background:rgba(231,76,60,0.15);border:1px solid #5a1e1e;border-radius:4px;color:#e74c3c;font-size:11px;padding:4px 8px;cursor:pointer;font-family:inherit">✕</button>
+      </div>
+    </div>`;
+  }
+  const gi=document.getElementById("cGeneralItems");if(gi)gi.innerHTML=gen.map(rowHTML).join("");
+  const pi=document.getElementById("cPantItems");if(pi)pi.innerHTML=pant.map(rowHTML).join("");
+}
+
+function cSetItem(id,val){
+  cItems.forEach(i=>{if(i.id===id)i.value=Number(val)||0;});
+  cCalc();
+}
+
+function cRemoveItem(id){
+  cItems=cItems.filter(i=>i.id!==id);
+  cRenderItems();cCalc();
+}
+
+function cAddItem(){
+  const name=document.getElementById("cNewItemName").value.trim();
+  if(!name)return;
+  cItems.push({id:"c_"+Date.now(),label:name,value:Number(document.getElementById("cNewItemValue").value)||0,group:"general"});
+  document.getElementById("cNewItemName").value="";
+  document.getElementById("cNewItemValue").value="";
+  cRenderItems();cCalc();
+}
+
+function cSyncProfit(v){const el=document.getElementById("cProfit");if(el)el.value=v;cCalc();}
+function cSyncProfitNum(v){const el=document.getElementById("cProfitRange");if(el)el.value=v;cCalc();}
+
+function cCalc(){
+  const fabricCost=(cGetNum("cFabricPrice")*cGetNum("cFabricMeters"))/(cGetNum("cPiecesPerRoll")||1);
+  const pantFabricCost=(cGetNum("cPantFabricPrice")*cGetNum("cPantFabricMeters"))/(cGetNum("cPantPieces")||1);
+  const generalTotal=cItems.filter(i=>i.group!=="pant").reduce((s,i)=>s+Number(i.value||0),0);
+  const pantItemTotal=cItems.filter(i=>i.group==="pant").reduce((s,i)=>s+Number(i.value||0),0);
+  const pantTotal=pantItemTotal+pantFabricCost;
+  const total=fabricCost+generalTotal+pantTotal;
+  const profitPct=cGetNum("cProfit");
+  const profitAmt=total*profitPct/100;
+  const selling=total+profitAmt;
+  const pieces=cGetNum("cPiecesPerRoll")||1;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v;};
+  set("cFabricCost",cFmt(fabricCost));
+  set("cPantFabricCost",cFmt(pantFabricCost));
+  set("cGeneralTotal",cFmt(generalTotal));
+  set("cPantTotal",cFmt(pantTotal));
+  set("cSFabric",cFmt(fabricCost));
+  set("cSGeneral",cFmt(generalTotal));
+  set("cSPant",cFmt(pantTotal));
+  set("cSTotal",cFmt(total));
+  set("cSProfit",cFmt(profitAmt));
+  set("cSProfitPct",profitPct);
+  set("cSSelling",cFmt(selling));
+  set("cBatchN",pieces);
+  set("cBatchCost",cFmt(total*pieces));
+  set("cBatchSell",cFmt(selling*pieces));
+  set("cBatchProfit",cFmt(profitAmt*pieces));
+  const dn=(document.getElementById("cDesignNo")?.value||"").trim();
+  const tag=document.getElementById("cSummaryDesign");
+  if(tag){tag.textContent=dn?"#"+dn:"";tag.style.display=dn?"inline-block":"none";}
+}
+
+function cSaveDesign(){
+  const dn=(document.getElementById("cDesignNo")?.value||"").trim();
+  if(!dn){cFlash("⚠ আগে ডিজাইন নম্বর দিন",false);return;}
+  const record={
+    designNo:dn,
+    fabricPrice:cGetNum("cFabricPrice"),fabricMeters:cGetNum("cFabricMeters"),piecesPerRoll:cGetNum("cPiecesPerRoll"),
+    pantFabricPrice:cGetNum("cPantFabricPrice"),pantFabricMeters:cGetNum("cPantFabricMeters"),pantPieces:cGetNum("cPantPieces"),
+    items:JSON.parse(JSON.stringify(cItems)),profit:cGetNum("cProfit"),
+    total:document.getElementById("cSTotal")?.textContent||"0",
+    selling:document.getElementById("cSSelling")?.textContent||"0"
+  };
+  cSavedDesigns=cSavedDesigns.filter(d=>d.designNo!==dn);
+  cSavedDesigns.unshift(record);
+  cPersist();cFlash("✓ সেভ হয়েছে",true);cRenderSavedList();
+}
+
+function cRenderSavedList(){
+  const box=document.getElementById("cSavedList");if(!box)return;
+  if(!cSavedDesigns.length){box.innerHTML='<div style="color:#5a7a5a;font-size:13px;text-align:center;padding:8px 0">এখনো কোনো ডিজাইন সেভ করা হয়নি</div>';return;}
+  box.innerHTML=cSavedDesigns.map(d=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;margin-bottom:8px;background:rgba(155,89,182,0.07);border-radius:8px;border:1px solid #2d2a3a">
+      <div style="flex:1;cursor:pointer" onclick="cLoadDesign('${d.designNo}')">
+        <div style="font-size:15px;font-weight:800;color:#c39bd3">${d.designNo}</div>
+        <div style="font-size:11px;color:#6b9e7e">খরচ ৳${d.total} · বিক্রয় ৳${d.selling}</div>
+      </div>
+      <button onclick="cLoadDesign('${d.designNo}')" style="background:rgba(46,204,113,0.15);border:1px solid #1e4a1e;border-radius:5px;color:#2ecc71;font-size:12px;font-weight:700;padding:5px 10px;margin-right:8px;cursor:pointer;font-family:inherit">খুলুন</button>
+      <button onclick="cDeleteDesign('${d.designNo}')" style="background:rgba(231,76,60,0.15);border:1px solid #5a1e1e;border-radius:4px;color:#e74c3c;font-size:11px;padding:4px 8px;cursor:pointer;font-family:inherit">✕</button>
+    </div>`).join("");
+}
+
+function cToggleSaved(){
+  const box=document.getElementById("cSavedList");if(!box)return;
+  if(box.style.display==="none"||box.style.display===""){cRenderSavedList();box.style.display="block";}
+  else box.style.display="none";
+}
+
+function cLoadDesign(dn){
+  const d=cSavedDesigns.find(x=>x.designNo===dn);if(!d)return;
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set("cDesignNo",d.designNo);
+  set("cFabricPrice",d.fabricPrice);set("cFabricMeters",d.fabricMeters);set("cPiecesPerRoll",d.piecesPerRoll);
+  set("cPantFabricPrice",d.pantFabricPrice||0);set("cPantFabricMeters",d.pantFabricMeters||0);set("cPantPieces",d.pantPieces||1);
+  set("cProfit",d.profit);set("cProfitRange",d.profit);
+  cItems=JSON.parse(JSON.stringify(d.items));
+  document.getElementById("cSavedList").style.display="none";
+  cRenderItems();cCalc();cFlash("✓ "+d.designNo+" খোলা হয়েছে",true);
+}
+
+function cDeleteDesign(dn){
+  cSavedDesigns=cSavedDesigns.filter(d=>d.designNo!==dn);
+  cPersist();cRenderSavedList();
+}
+
+function cFlash(msg,ok){
+  const el=document.getElementById("cSaveStatus");if(!el)return;
+  el.textContent=msg;el.style.display="block";
+  el.style.background=ok?"rgba(46,204,113,0.15)":"rgba(243,156,18,0.15)";
+  el.style.color=ok?"#2ecc71":"#f39c12";
+  setTimeout(()=>el.style.display="none",2500);
+}
+
+window.cCalc=cCalc;window.cSyncProfit=cSyncProfit;window.cSyncProfitNum=cSyncProfitNum;
+window.cSetItem=cSetItem;window.cRemoveItem=cRemoveItem;window.cAddItem=cAddItem;
+window.cSaveDesign=cSaveDesign;window.cToggleSaved=cToggleSaved;window.cLoadDesign=cLoadDesign;window.cDeleteDesign=cDeleteDesign;
+cLoadSaved();
+
+function openGeetaWeb(){
+  document.getElementById("geetaWebModal").style.display="block";
+}
+window.openGeetaWeb=openGeetaWeb;
+const CATS=[
+  {id:"কাপড় কেনা",icon:"🧵",color:"#1565C0",bg:"#E3F2FD"},
+  {id:"দর্জি খরচ",icon:"✂️",color:"#6A1B9A",bg:"#F3E5F5"},
+  {id:"কাটিং খরচ",icon:"✂️",color:"#00838F",bg:"#E0F7FA"},
+  {id:"আয়রন খরচ",icon:"🔥",color:"#BF360C",bg:"#FBE9E7"},
+  {id:"বোতাম/শ্রমিক",icon:"🪡",color:"#558B2F",bg:"#F1F8E9"},
+  {id:"ইলেকট্রিক বিল",icon:"⚡",color:"#F9A825",bg:"#FFFDE7"},
+  {id:"এমব্রয়ডারি",icon:"🎨",color:"#E65100",bg:"#FFF3E0"},
+  {id:"বাক্স/প্যাকেজিং",icon:"📦",color:"#2E7D32",bg:"#E8F5E9"},
+  {id:"ট্রান্সপোর্ট",icon:"🚚",color:"#1976D2",bg:"#E3F2FD"},
+  {id:"প্রিন্টিং/লেবেল",icon:"🖨️",color:"#C62828",bg:"#FFE0E0"},
+  {id:"বেতন/শ্রমিক",icon:"👷",color:"#F57F17",bg:"#FFFDE7"},
+  {id:"অন্যান্য",icon:"💡",color:"#37474F",bg:"#ECEFF1"}
+];
+
+let purchases=[];
+let selCat=CATS[0].id;
+
+function initCatGrid(){
+  const g=document.getElementById("catGrid");
+  if(!g)return;
+  g.innerHTML=CATS.map(c=>`
+    <div onclick="selCategory('${c.id}')" id="cat-${c.id.replace(/\//g,'-')}"
+      style="background:${selCat===c.id?c.color:c.bg};color:${selCat===c.id?'#fff':c.color};border:2px solid ${c.color};border-radius:8px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .15s">
+      <div style="font-size:1.5rem">${c.icon}</div>
+      <div style="font-size:.75rem;font-weight:700;margin-top:3px">${c.id}</div>
+    </div>`).join("");
+  document.getElementById("pCat").value=selCat;
+  document.getElementById("pDate").value=new Date().toISOString().slice(0,10);
+}
+
+function selCategory(id){
+  selCat=id;
+  initCatGrid();
+}
+
+function calcPurchase(){
+  const qty=parseFloat(document.getElementById("pQty").value)||0;
+  const rate=parseFloat(document.getElementById("pRate").value)||0;
+  const totalEl=document.getElementById("pTotal");
+  const paidEl=document.getElementById("pPaid");
+  const dueEl=document.getElementById("pDue");
+  // If qty and rate given, calc total
+  if(qty>0&&rate>0)totalEl.value=(qty*rate).toFixed(2);
+  const total=parseFloat(totalEl.value)||0;
+  const paid=parseFloat(paidEl.value)||0;
+  dueEl.value=(total-paid).toFixed(2);
+}
+
+async function savePurchase(){
+  const cat=document.getElementById("pCat").value;
+  const desc=document.getElementById("pDesc").value.trim();
+  const total=parseFloat(document.getElementById("pTotal").value)||0;
+  if(!cat){showPMsg("❗ Category select করুন","err");return;}
+  if(!total){showPMsg("❗ মোট টাকা দিন","err");return;}
+  const data={
+    cat,
+    desc,
+    supplier:document.getElementById("pSupplier").value.trim(),
+    date:document.getElementById("pDate").value,
+    qty:parseFloat(document.getElementById("pQty").value)||0,
+    rate:parseFloat(document.getElementById("pRate").value)||0,
+    total,
+    paid:parseFloat(document.getElementById("pPaid").value)||0,
+    due:parseFloat(document.getElementById("pDue").value)||0,
+    note:document.getElementById("pNote").value.trim(),
+    shopId:currentShop?.id||"",
+    shopName:currentShop?.name||"",
+    createdAt:new Date().toISOString()
+  };
+  try{
+    await window.FB.addDoc(window.FB.collection(window.FB.db,"purchases"),{...data,ts:window.FB.serverTimestamp()});
+    // Reset form
+    ["pDesc","pSupplier","pQty","pRate","pTotal","pPaid","pNote"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
+    document.getElementById("pDue").value="";
+    showPMsg("✅ Purchase save হয়েছে!","ok");
+  }catch(e){
+    showPMsg("❌ Error: "+e.message,"err");
+  }
+}
+
+function renderPurchase(){
+  const f=document.getElementById("pFilter")?.value||"all";
+  let list=f==="all"?[...purchases]:purchases.filter(p=>p.cat===f);
+  list.sort((a,b)=>b.date?.localeCompare(a.date||"")||0);
+
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:0});
+  const totalSpent=list.reduce((s,p)=>s+(p.total||0),0);
+  const totalDue=list.reduce((s,p)=>s+(p.due||0),0);
+
+  // Summary by category
+  const catTotals={};
+  purchases.forEach(p=>{
+    if(!catTotals[p.cat])catTotals[p.cat]={total:0,due:0};
+    catTotals[p.cat].total+=(p.total||0);
+    catTotals[p.cat].due+=(p.due||0);
+  });
+
+  document.getElementById("purchaseSummary").innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.2rem;font-weight:800;color:#2E7D32">₹${fmt(totalSpent)}</div>
+        <div style="font-size:.75rem;color:#555">মোট খরচ</div>
+      </div>
+      <div style="background:#FFE0E0;border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:1.2rem;font-weight:800;color:#C62828">₹${fmt(totalDue)}</div>
+        <div style="font-size:.75rem;color:#555">বাকি পরিমাণ</div>
+      </div>
+    </div>
+    ${f==="all"?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
+      ${CATS.filter(c=>catTotals[c.id]).map(c=>`
+        <div style="background:${c.bg};border-radius:7px;padding:9px;border-left:4px solid ${c.color}">
+          <div style="font-size:.82rem;font-weight:700;color:${c.color}">${c.icon} ${c.id}</div>
+          <div style="font-size:.9rem;font-weight:800;color:#1A1208;margin-top:2px">₹${fmt(catTotals[c.id].total)}</div>
+          ${catTotals[c.id].due>0?`<div style="font-size:.75rem;color:#C62828">বাকি: ₹${fmt(catTotals[c.id].due)}</div>`:''}
+        </div>`).join("")}
+    </div>`:''  }`;
+
+  const box=document.getElementById("purchaseList");
+  if(!list.length){box.innerHTML=`<p style="text-align:center;padding:20px;color:#888">কোনো purchase নেই</p>`;return;}
+
+  box.innerHTML=list.map(p=>{
+    const cat=CATS.find(c=>c.id===p.cat)||{icon:"💡",color:"#666",bg:"#eee"};
+    return`<div style="background:#fff;border:1.5px solid #eee;border-radius:8px;padding:12px;margin-bottom:8px;border-left:4px solid ${cat.color}">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px">
+        <div>
+          <div style="font-weight:700;font-size:.9rem">${cat.icon} ${p.cat}
+            ${p.shopName?`<span style="font-size:.7rem;color:#888;font-weight:400"> · ${p.shopName}</span>`:''}
+          </div>
+          <div style="font-size:.85rem;color:#444;margin-top:2px">${p.desc||'—'}${p.supplier?' · '+p.supplier:''}</div>
+          <div style="font-size:.75rem;color:#888;margin-top:2px">📅 ${p.date||'—'}${p.qty?` · ${p.qty} × ₹${p.rate}`:''}</div>
+          ${p.note?`<div style="font-size:.75rem;color:#666;margin-top:2px;font-style:italic">${p.note}</div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-weight:800;color:#27ae60;font-size:1rem">₹${fmt(p.total)}</div>
+          ${p.due>0?`<div style="color:#C62828;font-size:.8rem;font-weight:700">বাকি: ₹${fmt(p.due)}</div>`:`<div style="color:#27ae60;font-size:.78rem">✅ পরিশোধ</div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function showPMsg(msg,type){
+  const n=document.getElementById("pMsg");
+  if(!n)return;
+  n.className="notice "+type;n.textContent=msg;
+  clearTimeout(n._t);n._t=setTimeout(()=>{n.style.display="none";n.className="notice";},4000);
+}
+
+window.selCategory=selCategory;window.calcPurchase=calcPurchase;window.savePurchase=savePurchase;window.renderPurchase=renderPurchase;
+
+// ===== FIREBASE INIT =====
+window.addEventListener("fbOK",()=>{
+  // All bills
+  window.FB.onSnapshot(window.FB.query(window.FB.collection(window.FB.db,"bills"),window.FB.orderBy("createdAt","desc")),snap=>{
+    allBills=[];snap.forEach(d=>allBills.push({id:d.id,...d.data()}));
+    bills=currentShop?allBills.filter(b=>b.shopId===currentShop.id):allBills;
+    buildC();if(!curId)resetInvNo();renderList();
+  });
+  // Settings
+  window.FB.onSnapshot(window.FB.doc(window.FB.db,"billing_settings","main"),d=>{
+    if(d.exists()){loadS(d.data());if(d.data().password)S.password=d.data().password;}
+  });
+  // Shops
+  window.FB.onSnapshot(window.FB.doc(window.FB.db,"billing_settings","shops"),d=>{
+    if(d.exists()&&d.data().shops){shops=d.data().shops;renderShopGrid();renderShopMgmt();}
+  });
+  // Contacts
+  window.FB.onSnapshot(window.FB.collection(window.FB.db,"contacts"),snap=>{
+    savedContacts=[];snap.forEach(d=>savedContacts.push({id:d.id,...d.data()}));
+    buildC();renderCustList();
+  });
+  // Products (stock)
+  window.FB.onSnapshot(window.FB.collection(window.FB.db,"products"),snap=>{
+    shopProducts=[];snap.forEach(d=>shopProducts.push({id:d.id,...d.data()}));
+    renderStock();itemIds.forEach(id=>checkStock(id));
+  });
+  // Purchases
+  window.FB.onSnapshot(window.FB.query(window.FB.collection(window.FB.db,"purchases"),window.FB.orderBy("ts","desc")),snap=>{
+    purchases=[];snap.forEach(d=>purchases.push({id:d.id,...d.data()}));
+    renderPurchase();
+  });
+});
+
+// INIT
+document.getElementById("bDate").value=new Date().toISOString().slice(0,10);
+document.getElementById("pwInput").focus();
+</script>
+</body>
+</html>
+
