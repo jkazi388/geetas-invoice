@@ -868,17 +868,9 @@ let S={
 
 // ===== LOGIN =====
 function doLogin(){
-  const pw=document.getElementById("pwInput").value;
-  // Accept local password OR Firebase password OR master key
-  const ok=(pw===S.password||pw==="geeta2027"||pw==="geeta@2027"||pw==="geeta2026");
-  if(ok){
-    document.getElementById("loginScreen").style.display="none";
-    showShopScreen();
-  }else{
-    document.getElementById("loginErr").style.display="block";
-    document.getElementById("pwInput").value="";
-    document.getElementById("pwInput").focus();
-  }
+  // Direct login - no password needed temporarily
+  document.getElementById("loginScreen").style.display="none";
+  showShopScreen();
 }
 
 function doLogout(){
@@ -1683,4 +1675,12 @@ function waOne(id){
 
 async function delB(id){
   if(!confirm("Delete?"))return;
-  try{await window.FB.deleteDoc(window.FB.
+  try{await window.FB.deleteDoc(window.FB.doc(window.FB.db,"bills",id));document.getElementById("billOv")?.remove();}
+  catch(e){alert("Error: "+e.message);}
+}
+
+// ===== OWNER DASHBOARD =====
+function renderDash(){
+  const box=document.getElementById("dashBox");
+  const fmt=n=>(n||0).toLocaleString("en-IN",{maximumFractionDigits:0});
+  const today=new Date().toISOString().sli
